@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mapa do site e inventário de conteúdo — Evento UEPA / PET-Saúde</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Inter',system-ui,'Segoe UI',sans-serif;
+  background:#F4F5F8;color:#1B1D27;line-height:1.6;
+  -webkit-font-smoothing:antialiased;padding:44px 0 90px;font-size:15px;
+}
+.wrap{width:min(1180px,94vw);margin-inline:auto}
+h1,h2,h3{line-height:1.2;letter-spacing:-.015em}
+
+.page-head{max-width:74ch;margin-bottom:20px}
+.page-head span.kicker{
+  display:inline-block;background:#1B1D27;color:#fff;font-size:11px;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;padding:5px 12px;border-radius:5px;
+}
+.page-head h1{font-size:clamp(1.9rem,4.4vw,2.7rem);font-weight:700;margin:14px 0 12px}
+.page-head p{color:#5A5D6B}
+
+.warn{
+  background:#FFF6E5;border:1px solid #F0D9A8;border-left:4px solid #D9922B;
+  border-radius:8px;padding:14px 18px;font-size:13.5px;color:#6B5220;margin-bottom:46px;
+}
+.warn b{color:#4A3610}
+
+h2.sec{
+  font-size:12.5px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:#5A5D6B;
+  padding-bottom:10px;border-bottom:2px solid #D8DAE2;margin:52px 0 22px;
+}
+h2.sec span{color:#9A9DAB;font-weight:600;letter-spacing:.06em;text-transform:none;font-size:12px}
+
+.intro{color:#5A5D6B;font-size:14px;max-width:82ch;margin-bottom:24px}
+
+/* ---------------- diagrama do mapa ---------------- */
+.map{background:#fff;border:1px solid #DCDEE6;border-radius:14px;padding:30px 26px}
+.node{
+  border:1.5px solid #C3C6D2;border-radius:9px;background:#fff;padding:12px 16px;
+}
+.node b{display:block;font-size:14.5px;font-weight:700}
+.node small{display:block;font-size:11.5px;color:#7A7D8C;margin-top:2px}
+.node.home{background:#1B1D27;border-color:#1B1D27;color:#fff;width:min(320px,100%);margin:0 auto 6px}
+.node.home small{color:rgba(255,255,255,.68)}
+.node.page{background:#EEF0F6;border-color:#B9BDCC}
+.node.anchor{background:#fff;border-style:dashed}
+.node.ext{background:#F6F7FA;border-style:dotted;color:#5A5D6B}
+
+.trunk{width:2px;height:22px;background:#C3C6D2;margin:0 auto}
+.branch-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px;position:relative;padding-top:20px}
+.branch-row::before{
+  content:"";position:absolute;top:0;left:12%;right:12%;height:2px;background:#C3C6D2;
+}
+.branch{position:relative}
+.branch::before{content:"";position:absolute;top:-20px;left:50%;width:2px;height:20px;background:#C3C6D2}
+
+.sub{margin-top:12px;padding-left:14px;border-left:2px solid #E2E4EC;display:grid;gap:7px}
+.sub div{
+  font-size:12.5px;color:#5A5D6B;background:#F8F9FB;border:1px solid #E7E9F0;
+  border-radius:6px;padding:6px 10px;
+}
+.sub div b{font-weight:600;color:#3A3D4B}
+
+.map-legend{display:flex;flex-wrap:wrap;gap:18px;margin-top:26px;padding-top:20px;border-top:1px solid #E7E9F0;font-size:12px;color:#7A7D8C}
+.map-legend div{display:flex;align-items:center;gap:8px}
+.map-legend i{width:22px;height:14px;border-radius:4px;flex:none;display:block}
+
+/* ---------------- tabelas de inventário ---------------- */
+.inv{background:#fff;border:1px solid #DCDEE6;border-radius:14px;overflow:hidden;margin-bottom:22px}
+.inv-head{padding:18px 22px;border-bottom:1px solid #E7E9F0;background:#FAFAFC;display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;justify-content:space-between}
+.inv-head h3{font-size:17px}
+.inv-head p{font-size:12.5px;color:#7A7D8C;margin-top:2px;max-width:70ch}
+.count{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#9A9DAB;white-space:nowrap}
+
+.tbl-scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:760px}
+th{
+  text-align:left;font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#8A8D9B;
+  font-weight:700;padding:12px 16px;background:#F8F9FB;border-bottom:1px solid #E7E9F0;white-space:nowrap;
+}
+td{padding:13px 16px;border-bottom:1px solid #F0F1F5;vertical-align:top;color:#3A3D4B}
+tr:last-child td{border-bottom:0}
+td.item b{display:block;font-weight:600;color:#1B1D27}
+td.item small{display:block;font-size:11.5px;color:#8A8D9B;margin-top:2px}
+td.spec{font-size:12.5px;color:#5A5D6B;white-space:nowrap}
+td.who{font-size:12.5px;color:#5A5D6B}
+
+.st{
+  display:inline-block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  padding:4px 9px;border-radius:5px;white-space:nowrap;
+}
+.st.ok{background:#E4F2E8;color:#2E6B41}
+.st.wait{background:#FFF1DC;color:#8A5A14}
+.st.miss{background:#FBE4E4;color:#8F2C2C}
+
+/* ---------------- pendências ---------------- */
+.asks{background:#fff;border:1px solid #DCDEE6;border-radius:14px;padding:24px 26px}
+.asks ol{list-style:none;counter-reset:q;display:grid;gap:16px}
+.asks li{counter-increment:q;padding-left:38px;position:relative;font-size:14px}
+.asks li::before{
+  content:counter(q);position:absolute;left:0;top:1px;width:25px;height:25px;border-radius:7px;
+  background:#1B1D27;color:#fff;font-size:12px;font-weight:700;display:grid;place-items:center;
+}
+.asks li b{display:block;margin-bottom:2px}
+.asks li span{color:#5A5D6B;font-size:13px}
+
+.footnote{margin-top:30px;font-size:13.5px;color:#5A5D6B;max-width:80ch}
+.footnote b{color:#1B1D27}
+
+@media (max-width:640px){
+  .map{padding:20px 16px}
+  .branch-row::before{display:none}
+  .branch::before{display:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="page-head">
+    <span class="kicker">Arquitetura de informação</span>
+    <h1>Mapa do site e inventário de conteúdo</h1>
+    <p>Este documento responde a três perguntas antes de qualquer linha de código: <b>quantas páginas o site terá</b>, <b>o que entra em cada uma</b> e <b>quem fornece cada informação</b>. É o que evita descobrir na véspera que ninguém tinha a foto dos palestrantes.</p>
+  </div>
+
+  <div class="warn">
+    <b>Atenção — dados de exemplo.</b> Nomes, datas, endereços, telefones e quantidades usados nos protótipos foram inventados como preenchimento. Nenhum dado real do evento foi confirmado até aqui. As colunas <b>Responsável</b> e <b>Status</b> deste inventário estão preenchidas com uma hipótese de trabalho e precisam ser validadas com a coordenação do evento.
+  </div>
+
+  <!-- ================= MAPA ================= -->
+  <h2 class="sec">Parte 1 · Mapa do site <span>— estrutura recomendada</span></h2>
+  <p class="intro">Recomendação: <b>página única com âncoras</b> para o essencial, mais três páginas separadas para o conteúdo que é longo, muda de versão ou precisa de link próprio para divulgar. Evento acadêmico de porte médio não sustenta um site de dez páginas — e página única converte melhor a inscrição.</p>
+
+  <div class="map">
+    <div class="node home">
+      <b>Home — página única</b>
+      <small>rolagem com âncoras · endereço principal divulgado nas redes</small>
+    </div>
+    <div class="trunk"></div>
+
+    <div class="branch-row">
+
+      <div class="branch">
+        <div class="node anchor"><b>#sobre</b><small>âncora na home</small></div>
+        <div class="sub">
+          <div><b>O que é o evento</b> — 1 parágrafo</div>
+          <div><b>Objetivos</b> — 3 a 4 tópicos</div>
+          <div><b>Público-alvo</b> — quem pode participar</div>
+          <div><b>Realização</b> — UEPA + PET-Saúde</div>
+        </div>
+      </div>
+
+      <div class="branch">
+        <div class="node anchor"><b>#programacao</b><small>âncora + resumo</small></div>
+        <div class="sub">
+          <div><b>Resumo por dia</b> — visão geral</div>
+          <div><b>Destaques</b> — 3 a 5 atividades</div>
+          <div><b>Link</b> → grade completa</div>
+        </div>
+      </div>
+
+      <div class="branch">
+        <div class="node anchor"><b>#palestrantes</b><small>âncora na home</small></div>
+        <div class="sub">
+          <div><b>Foto + nome + minicurrículo</b></div>
+          <div><b>Instituição de origem</b></div>
+          <div><b>Tema da fala</b> (opcional)</div>
+        </div>
+      </div>
+
+      <div class="branch">
+        <div class="node anchor"><b>#local</b><small>âncora na home</small></div>
+        <div class="sub">
+          <div><b>Endereço completo</b></div>
+          <div><b>Mapa incorporado</b></div>
+          <div><b>Como chegar</b> — ônibus, estacionamento</div>
+          <div><b>Acessibilidade</b> — recursos disponíveis</div>
+        </div>
+      </div>
+
+      <div class="branch">
+        <div class="node anchor"><b>#contato</b><small>âncora + rodapé</small></div>
+        <div class="sub">
+          <div><b>E-mail oficial</b> do evento</div>
+          <div><b>Redes sociais</b> do PET-Saúde</div>
+          <div><b>Dúvidas frequentes</b> — 5 a 8 perguntas</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="trunk" style="margin-top:26px"></div>
+
+    <div class="branch-row">
+
+      <div class="branch">
+        <div class="node page"><b>/programacao</b><small>página própria</small></div>
+        <div class="sub">
+          <div><b>Grade completa</b> dos 3 dias</div>
+          <div><b>Filtro por dia / trilha</b></div>
+          <div><b>Versão em PDF</b> para baixar e imprimir</div>
+          <div><b>Por quê:</b> muda várias vezes até o evento e precisa de link próprio</div>
+        </div>
+      </div>
+
+      <div class="branch">
+        <div class="node page"><b>/submissao</b><small>página própria</small></div>
+        <div class="sub">
+          <div><b>Normas</b> para envio de resumos</div>
+          <div><b>Prazos</b> e cronograma de avaliação</div>
+          <div><b>Modelo de resumo</b> para baixar</div>
+          <div><b>Critérios</b> de avaliação e premiação</div>
+        </div>
+      </div>
+
+      <div class="branch">
+        <div class="node page"><b>/inscricao</b><small>página ou formulário externo</small></div>
+        <div class="sub">
+          <div><b>Formulário</b> ou redirecionamento</div>
+          <div><b>Categorias</b> de participação</div>
+          <div><b>Confirmação</b> por e-mail</div>
+        </div>
+      </div>
+
+      <div class="branch">
+        <div class="node ext"><b>Links externos</b><small>fora do site</small></div>
+        <div class="sub">
+          <div><b>Instagram</b> do PET-Saúde</div>
+          <div><b>Portal da UEPA</b></div>
+          <div><b>Certificados</b> — plataforma da universidade</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="map-legend">
+      <div><i style="background:#1B1D27"></i> página principal</div>
+      <div><i style="background:#fff;border:1.5px dashed #C3C6D2"></i> seção da home (âncora)</div>
+      <div><i style="background:#EEF0F6;border:1.5px solid #B9BDCC"></i> página separada</div>
+      <div><i style="background:#F6F7FA;border:1.5px dotted #C3C6D2"></i> destino externo</div>
+    </div>
+  </div>
+
+  <!-- ================= INVENTÁRIO ================= -->
+  <h2 class="sec">Parte 2 · Inventário de conteúdo <span>— o que precisa ser produzido</span></h2>
+  <p class="intro">Cada linha é um item que alguém precisa escrever, fotografar ou confirmar. A coluna <b>Formato</b> traz o limite prático: texto que não cabe no espaço previsto quebra o layout, então o limite faz parte do pedido.</p>
+
+  <!-- Home -->
+  <div class="inv">
+    <div class="inv-head">
+      <div>
+        <h3>Home — página única</h3>
+        <p>Conteúdo da página principal, na ordem em que aparece.</p>
+      </div>
+      <span class="count">12 itens</span>
+    </div>
+    <div class="tbl-scroll">
+    <table>
+      <tr><th>Item</th><th>Formato / limite</th><th>Responsável</th><th>Status</th></tr>
+
+      <tr><td class="item"><b>Nome oficial do evento</b><small>usado no topo, no título da aba e nas peças</small></td>
+          <td class="spec">até 60 caracteres</td><td class="who">Coordenação</td><td><span class="st miss">A definir</span></td></tr>
+
+      <tr><td class="item"><b>Datas e horários</b><small>início, fim e horário de funcionamento</small></td>
+          <td class="spec">formato dd–dd/mm/aaaa</td><td class="who">Coordenação</td><td><span class="st miss">A definir</span></td></tr>
+
+      <tr><td class="item"><b>Chamada do banner</b><small>frase de uma linha que resume o evento</small></td>
+          <td class="spec">até 90 caracteres</td><td class="who">Comunicação</td><td><span class="st miss">A definir</span></td></tr>
+
+      <tr><td class="item"><b>Parágrafo de apresentação</b><small>o que é o evento, em linguagem direta</small></td>
+          <td class="spec">300 a 400 caracteres</td><td class="who">Coordenação</td><td><span class="st miss">A definir</span></td></tr>
+
+      <tr><td class="item"><b>Imagem de fundo do banner</b><small>campus, edição anterior ou grafismo</small></td>
+          <td class="spec">1920×1080 px · JPG</td><td class="who">Comunicação</td><td><span class="st wait">Pendente</span></td></tr>
+
+      <tr><td class="item"><b>Números do evento</b><small>vagas, carga horária, nº de atividades</small></td>
+          <td class="spec">4 pares rótulo + valor</td><td class="who">Coordenação</td><td><span class="st miss">A definir</span></td></tr>
+
+      <tr><td class="item"><b>Objetivos do evento</b><small>tópicos curtos, não parágrafo</small></td>
+          <td class="spec">3 a 4 itens · 80 car. cada</td><td class="who">Coordenação</td><td><span class="st miss">A definir</span></td></tr>
+
+      <tr><td class="item"><b>Blocos de destaque</b><small>conferências, oficinas, mostra científica</small></td>
+          <td class="spec">3 blocos · título + 140 car.</td><td class="who">Comunicação</td><td><span class="st miss">A definir</span></td></tr>
+
+      <tr><td class="item"><b>Resumo da programação</b><small>visão geral por dia, com link para a grade</small></td>
+          <td class="spec">3 blocos · 5 linhas cada</td><td class="who">Comissão científica</td><td><span class="st wait">Pendente</span></td></tr>
+
+      <tr><td class="item"><b>Endereço e ponto de referência</b><small>com nome do prédio e do auditório</small></td>
+          <td class="spec">texto livre curto</td><td class="who">Coordenação</td><td><span class="st miss">A definir</span></td></tr>
+
+      <tr><td class="item"><b>Recursos de acessibilidade</b><small>Libras, rampas, lugares reservados</small></td>
+          <td class="spec">lista de itens confirmados</td><td class="who">Coordenação</td><td><span class="st miss">A definir</span></td></tr>
+
+      <tr><td class="item"><b>E-mail e telefone oficiais</b><small>canal que realmente será respondido</small></td>
+          <td class="spec">1 e-mail + 1 telefone</td><td class="who">Coordenação</td><td><span class="st miss">A definir</span></td></tr>
+    </table>
+    </div>
+  </div>
+
+  <!-- Palestrantes -->
+  <div class="inv">
+    <div class="inv-head">
+      <div>
+        <h3>Palestrantes</h3>
+        <p>Um conjunto completo por convidado. É o item que mais atrasa em evento acadêmico — comece a pedir cedo.</p>
+      </div>
+      <span class="count">4 itens × nº de convidados</span>
+    </div>
+    <div class="tbl-scroll">
+    <table>
+      <tr><th>Item</th><th>Formato / limite</th><th>Responsável</th><th>Status</th></tr>
+      <tr><td class="item"><b>Foto</b><small>rosto centralizado, fundo neutro de preferência</small></td>
+          <td class="spec">mín. 600×600 px · quadrada</td><td class="who">Cada convidado</td><td><span class="st wait">Pendente</span></td></tr>
+      <tr><td class="item"><b>Nome com titulação</b><small>como a pessoa quer ser identificada</small></td>
+          <td class="spec">até 45 caracteres</td><td class="who">Cada convidado</td><td><span class="st wait">Pendente</span></td></tr>
+      <tr><td class="item"><b>Instituição e cargo</b><small>vínculo atual</small></td>
+          <td class="spec">até 60 caracteres</td><td class="who">Cada convidado</td><td><span class="st wait">Pendente</span></td></tr>
+      <tr><td class="item"><b>Autorização de uso de imagem</b><small>necessária para publicar foto e nome</small></td>
+          <td class="spec">documento assinado</td><td class="who">Coordenação</td><td><span class="st miss">A definir</span></td></tr>
+    </table>
+    </div>
+  </div>
+
+  <!-- Programação -->
+  <div class="inv">
+    <div class="inv-head">
+      <div>
+        <h3>Página /programacao</h3>
+        <p>A grade é o conteúdo que mais muda. Vale definir desde já quem tem autoridade para alterá-la e com que antecedência.</p>
+      </div>
+      <span class="count">6 itens</span>
+    </div>
+    <div class="tbl-scroll">
+    <table>
+      <tr><th>Item</th><th>Formato / limite</th><th>Responsável</th><th>Status</th></tr>
+      <tr><td class="item"><b>Grade completa</b><small>horário, título, tipo, local e responsável</small></td>
+          <td class="spec">planilha com 5 colunas</td><td class="who">Comissão científica</td><td><span class="st wait">Pendente</span></td></tr>
+      <tr><td class="item"><b>Número de trilhas simultâneas</b><small>define se cabe lista ou precisa de grade</small></td>
+          <td class="spec">decisão estrutural</td><td class="who">Comissão científica</td><td><span class="st miss">A definir</span></td></tr>
+      <tr><td class="item"><b>Oficinas com vaga limitada</b><small>quais exigem inscrição à parte</small></td>
+          <td class="spec">lista + nº de vagas</td><td class="who">Coordenação</td><td><span class="st miss">A definir</span></td></tr>
+      <tr><td class="item"><b>Salas e blocos</b><small>onde cada atividade acontece</small></td>
+          <td class="spec">nome curto por atividade</td><td class="who">Coordenação</td><td><span class="st miss">A definir</span></td></tr>
+      <tr><td class="item"><b>PDF da programação</b><small>versão para imprimir e circular no WhatsApp</small></td>
+          <td class="spec">A4 · gerado do site</td><td class="who">Comunicação</td><td><span class="st wait">Pendente</span></td></tr>
+      <tr><td class="item"><b>Data da última atualização</b><small>exibida na página, evita confusão</small></td>
+          <td class="spec">automático</td><td class="who">Site</td><td><span class="st ok">Resolvido</span></td></tr>
+    </table>
+    </div>
+  </div>
+
+  <!-- Submissão + inscrição -->
+  <div class="inv">
+    <div class="inv-head">
+      <div>
+        <h3>Páginas /submissao e /inscricao</h3>
+        <p>Conteúdo normativo. Precisa de texto exato — aqui não cabe adaptação livre de redação.</p>
+      </div>
+      <span class="count">8 itens</span>
+    </div>
+    <div class="tbl-scroll">
+    <table>
+      <tr><th>Item</th><th>Formato / limite</th><th>Responsável</th><th>Status</th></tr>
+      <tr><td class="item"><b>Normas de submissão</b><small>estrutura, tamanho e formatação do resumo</small></td>
+          <td class="spec">texto oficial · sem edição</td><td class="who">Comissão científica</td><td><span class="st wait">Pendente</span></td></tr>
+      <tr><td class="item"><b>Cronograma de prazos</b><small>abertura, encerramento, resultado</small></td>
+          <td class="spec">4 a 6 datas</td><td class="who">Comissão científica</td><td><span class="st miss">A definir</span></td></tr>
+      <tr><td class="item"><b>Modelo de resumo</b><small>arquivo para baixar</small></td>
+          <td class="spec">DOCX + PDF</td><td class="who">Comissão científica</td><td><span class="st wait">Pendente</span></td></tr>
+      <tr><td class="item"><b>Critérios de avaliação</b><small>como os trabalhos serão julgados</small></td>
+          <td class="spec">lista de critérios</td><td class="who">Comissão científica</td><td><span class="st miss">A definir</span></td></tr>
+      <tr><td class="item"><b>Premiação</b><small>o que ganha quem for selecionado</small></td>
+          <td class="spec">texto curto</td><td class="who">Coordenação</td><td><span class="st miss">A definir</span></td></tr>
+      <tr><td class="item"><b>Onde a inscrição acontece</b><small>formulário no site ou plataforma externa</small></td>
+          <td class="spec">decisão estrutural</td><td class="who">Coordenação</td><td><span class="st miss">A definir</span></td></tr>
+      <tr><td class="item"><b>Categorias de participação</b><small>estudante, docente, profissional, externo</small></td>
+          <td class="spec">lista + regras de cada</td><td class="who">Coordenação</td><td><span class="st miss">A definir</span></td></tr>
+      <tr><td class="item"><b>Regra do certificado</b><small>carga horária e presença mínima</small></td>
+          <td class="spec">texto curto e exato</td><td class="who">Coordenação</td><td><span class="st miss">A definir</span></td></tr>
+    </table>
+    </div>
+  </div>
+
+  <!-- Identidade -->
+  <div class="inv">
+    <div class="inv-head">
+      <div>
+        <h3>Identidade visual e arquivos</h3>
+        <p>Sem estes arquivos o site não pode ser finalizado — logo em baixa resolução é o erro mais visível de todos.</p>
+      </div>
+      <span class="count">5 itens</span>
+    </div>
+    <div class="tbl-scroll">
+    <table>
+      <tr><th>Item</th><th>Formato / limite</th><th>Responsável</th><th>Status</th></tr>
+      <tr><td class="item"><b>Logo da UEPA em vetor</b><small>versão oficial, não baixada do Google</small></td>
+          <td class="spec">SVG, AI ou EPS</td><td class="who">Ascom UEPA</td><td><span class="st wait">Pendente</span></td></tr>
+      <tr><td class="item"><b>Logo do PET-Saúde em vetor</b><small>idem</small></td>
+          <td class="spec">SVG, AI ou EPS</td><td class="who">PET-Saúde</td><td><span class="st wait">Pendente</span></td></tr>
+      <tr><td class="item"><b>Logos de apoio</b><small>Ministério da Saúde, SESPA, se houver</small></td>
+          <td class="spec">SVG · ordem hierárquica</td><td class="who">Coordenação</td><td><span class="st miss">A definir</span></td></tr>
+      <tr><td class="item"><b>Paleta de cores</b><small>duas opções propostas</small></td>
+          <td class="spec">definido</td><td class="who">Design</td><td><span class="st ok">Resolvido</span></td></tr>
+      <tr><td class="item"><b>Estrutura da página</b><small>modelos de disposição propostos</small></td>
+          <td class="spec">4 modelos + variações</td><td class="who">Design</td><td><span class="st ok">Resolvido</span></td></tr>
+    </table>
+    </div>
+  </div>
+
+  <!-- ================= PENDÊNCIAS ================= -->
+  <h2 class="sec">Parte 3 · Decisões que travam o resto <span>— responder primeiro</span></h2>
+  <p class="intro">Estas oito perguntas mudam a estrutura do site, não só o texto. Enquanto não forem respondidas, qualquer avanço corre risco de ser refeito.</p>
+
+  <div class="asks">
+    <ol>
+      <li><b>Quantos dias tem o evento e quantas atividades acontecem ao mesmo tempo?</b>
+          <span>Define se a programação cabe numa lista simples ou exige grade com colunas — e a grade é justamente o formato que não funciona bem no celular.</span></li>
+
+      <li><b>A inscrição acontece no site ou numa plataforma externa?</b>
+          <span>Se for externa (Even3, Google Forms, Sigaa), o site só encaminha e o trabalho cai pela metade. Se for no site, entra tratamento de dados pessoais e LGPD.</span></li>
+
+      <li><b>Existe submissão de trabalhos?</b>
+          <span>Se sim, é a página mais consultada do site depois da programação — e a que tem prazo mais rígido.</span></li>
+
+      <li><b>Quem hospeda o site e em qual endereço?</b>
+          <span>Subdomínio da UEPA exige pedido formal ao setor de TI, com prazo próprio. Hospedagem externa é mais rápida mas tem menos peso institucional.</span></li>
+
+      <li><b>Quem atualiza o site depois de publicado?</b>
+          <span>Se a resposta for "ninguém que saiba mexer em código", a programação precisa vir de uma planilha ou o site nasce desatualizado.</span></li>
+
+      <li><b>O evento é presencial, on-line ou híbrido?</b>
+          <span>Híbrido acrescenta link de transmissão, sala virtual e uma segunda lógica de inscrição — muda o mapa inteiro.</span></li>
+
+      <li><b>Há inscrição paga ou é totalmente gratuito?</b>
+          <span>Pagamento traz meio de cobrança, comprovante e política de reembolso. É a mudança de escopo mais cara da lista.</span></li>
+
+      <li><b>Qual a data limite de publicação do site?</b>
+          <span>Determina o que entra na primeira versão e o que fica para depois. Site de evento pode nascer incompleto, desde que a inscrição funcione.</span></li>
+    </ol>
+  </div>
+
+  <p class="footnote"><b>Leitura do quadro:</b> dos 35 itens inventariados, 3 estão resolvidos, 10 dependem de terceiros e 22 ainda não têm definição. Os itens marcados como <b>Pendente</b> são os mais arriscados do cronograma: não dependem de decisão, dependem de alguém enviar um arquivo — logo em vetor e foto de palestrante são os dois clássicos que atrasam entrega de site de evento.</p>
+
+</div>
+</body>
+</html>

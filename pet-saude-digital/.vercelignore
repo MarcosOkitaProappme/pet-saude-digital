@@ -1,0 +1,8 @@
+# O build acontece nos servidores da Vercel: nao faz sentido subir dependencias
+# nem o resultado de build local.
+node_modules
+dist
+
+# Scripts de verificacao com Chrome headless: rodam so na maquina de quem
+# desenvolve, nunca no deploy.
+scripts

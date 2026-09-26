@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-pet-ink font-sans text-pet-deep antialiased;
+  }
+
+  ::selection {
+    @apply bg-pet-orange text-white;
+  }
+
+  /* O layout e de tela cheia: quem rola e o painel de conteudo, nunca o body.
+     Isso mantem o menu de abas sempre visivel, como o cliente pediu. */
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+}
+
+@layer components {
+  /* Rotulo tipografico usado no lugar de "badges" coloridas. */
+  .label {
+    @apply text-[10px] font-semibold uppercase tracking-label;
+  }
+
+  /* Regua fina — substitui a borda de cartao como elemento de separacao. */
+  .rule {
+    @apply border-t border-pet-navy/15;
+  }
+
+  /* Barra de rolagem discreta dentro do painel de conteudo. */
+  .scroll-slim {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(23, 60, 94, 0.28) transparent;
+  }
+  .scroll-slim::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+  }
+  .scroll-slim::-webkit-scrollbar-thumb {
+    background-color: rgba(23, 60, 94, 0.28);
+    border-radius: 999px;
+  }
+  .scroll-slim::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  /* Menu de abas no mobile: rola na horizontal sem exibir a barra. */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Malha tipografica de fundo — detalhe grafico de peca impressa. */
+  .grid-paper {
+    background-image:
+      linear-gradient(to right, rgba(23, 60, 94, 0.055) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(23, 60, 94, 0.055) 1px, transparent 1px);
+    background-size: 84px 84px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

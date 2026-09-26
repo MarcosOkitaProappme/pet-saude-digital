@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wireframes — Site do evento UEPA / PET-Saúde</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Inter',system-ui,'Segoe UI',sans-serif;
+  background:#EDEEF0;color:#2B2D33;line-height:1.55;
+  -webkit-font-smoothing:antialiased;padding:44px 0 90px;
+}
+.wrap{width:min(1240px,94vw);margin-inline:auto}
+
+h1,h2,h3{line-height:1.15}
+.page-head{max-width:72ch;margin-bottom:46px}
+.page-head span{
+  display:inline-block;background:#2B2D33;color:#fff;font-size:11px;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;padding:5px 12px;border-radius:5px;
+}
+.page-head h1{font-size:clamp(1.9rem,4.4vw,2.8rem);font-weight:700;margin:14px 0 12px;letter-spacing:-.02em}
+.page-head p{color:#61646E;font-size:15px}
+
+h2.sec{
+  font-size:13px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:#61646E;
+  padding-bottom:10px;border-bottom:2px solid #D3D5DA;margin:56px 0 26px;
+}
+
+/* ---------- primitivas de wireframe ---------- */
+.wf{background:#fff;border:1px solid #C9CCD3;border-radius:8px}
+.blk{background:#fff;border:1.5px dashed #B7BAC3;border-radius:6px;padding:10px}
+.solid{background:#DCDEE3;border:1px solid #C4C7CF;border-radius:5px}
+.dark{background:#8A8E99;border-radius:5px}
+.darker{background:#4A4D57;border-radius:5px}
+
+/* linhas de texto simuladas */
+.ln{height:7px;border-radius:3px;background:#D3D5DA;margin-bottom:6px}
+.ln.t{height:13px;background:#A8ABB5}
+.ln.t2{height:10px;background:#B7BAC3}
+.ln.w90{width:90%}.ln.w75{width:75%}.ln.w60{width:60%}.ln.w45{width:45%}.ln.w30{width:30%}
+.ln:last-child{margin-bottom:0}
+
+/* placeholder de imagem com X */
+.img{
+  background:
+    linear-gradient(to top right, transparent calc(50% - .6px), #C2C5CD 50%, transparent calc(50% + .6px)),
+    linear-gradient(to bottom right, transparent calc(50% - .6px), #C2C5CD 50%, transparent calc(50% + .6px)),
+    #F2F3F5;
+  border:1px solid #C9CCD3;border-radius:5px;
+}
+.circ{background:#D3D5DA;border-radius:50%;border:1px solid #C4C7CF}
+.btn{
+  background:#8A8E99;border-radius:5px;height:24px;
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+}
+.btn.ghost{background:transparent;border:1.5px solid #A8ABB5;color:#6E7079}
+.lbl{
+  font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:#8A8E99;margin-bottom:6px;display:block;
+}
+.note-in{font-size:10px;color:#8A8E99;font-style:italic}
+
+/* ---------- moldura de "tela" ---------- */
+.screens{display:grid;grid-template-columns:repeat(auto-fit,minmax(268px,1fr));gap:22px;align-items:start}
+.screen{background:#fff;border:1px solid #C9CCD3;border-radius:12px;overflow:hidden;box-shadow:0 4px 14px rgba(30,33,40,.06)}
+.screen-top{
+  padding:12px 15px;border-bottom:1px solid #E4E6EA;background:#F7F8F9;
+  display:flex;align-items:baseline;justify-content:space-between;gap:8px;
+}
+.screen-top b{font-size:13.5px;font-weight:700}
+.screen-top em{font-style:normal;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#9A9DA6}
+.screen-desc{padding:10px 15px 0;font-size:11.5px;color:#71747E;min-height:52px}
+.canvas{padding:14px 15px 16px}
+
+/* barra de navegação do wireframe */
+.navbar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border:1.5px dashed #B7BAC3;border-radius:6px;margin-bottom:10px}
+.navbar .logo{width:30px;height:14px;background:#8A8E99;border-radius:3px;flex:none}
+.navbar .links{display:flex;gap:6px;flex:1;justify-content:center}
+.navbar .links i{display:block;width:22px;height:6px;background:#D3D5DA;border-radius:3px}
+.navbar .cta{width:38px;height:14px;background:#4A4D57;border-radius:3px;flex:none}
+
+/* utilitários de layout */
+.row{display:flex;gap:8px}
+.col{display:flex;flex-direction:column;gap:8px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.mb{margin-bottom:10px}
+.center{text-align:center}
+.stack{display:flex;flex-direction:column;gap:10px}
+
+/* legenda dos prós/contras */
+.pros{padding:12px 15px 16px;border-top:1px solid #E4E6EA;background:#FAFAFB}
+.pros dl{display:grid;gap:7px;font-size:11.5px}
+.pros dt{font-weight:700;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#9A9DA6}
+.pros dd{color:#5A5D66}
+
+/* variações de blocos */
+.variants{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
+.variant{background:#fff;border:1px solid #C9CCD3;border-radius:10px;overflow:hidden}
+.variant-head{padding:11px 14px;border-bottom:1px solid #E4E6EA;background:#F7F8F9}
+.variant-head b{font-size:12.5px}
+.variant-head p{font-size:11px;color:#71747E;margin-top:2px}
+.variant-body{padding:14px}
+
+.legend{
+  display:flex;flex-wrap:wrap;gap:20px;background:#fff;border:1px solid #C9CCD3;
+  border-radius:10px;padding:16px 20px;margin-bottom:10px;font-size:11.5px;color:#61646E;
+}
+.legend div{display:flex;align-items:center;gap:8px}
+.legend .k{width:26px;height:16px;border-radius:4px;flex:none}
+
+.footnote{margin-top:26px;font-size:13px;color:#61646E;max-width:76ch}
+.footnote b{color:#2B2D33}
+
+@media (max-width:620px){
+  .screens{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="page-head">
+    <span>Protótipo de baixa fidelidade</span>
+    <h1>Modelos de disposição de informação</h1>
+    <p>Wireframes em escala de cinza, sem cor e sem tipografia definitiva — de propósito. A ideia aqui é decidir <b>o que vem antes do quê</b> e <b>como cada bloco se organiza</b>, sem a cor e as imagens influenciando o julgamento. Cada modelo abaixo é uma forma diferente de arrumar o mesmo conteúdo.</p>
+  </div>
+
+  <div class="legend">
+    <div><span class="k solid"></span> bloco de conteúdo</div>
+    <div><span class="k img"></span> imagem / foto</div>
+    <div><span class="k dark"></span> área de destaque</div>
+    <div><span class="k" style="background:#fff;border:1.5px dashed #B7BAC3"></span> container / seção</div>
+    <div><span class="k darker"></span> botão principal</div>
+  </div>
+
+  <!-- ================= MODELOS DE PÁGINA ================= -->
+  <h2 class="sec">Parte 1 · Quatro modelos de página inteira</h2>
+
+  <div class="screens">
+
+    <!-- MODELO 1 -->
+    <div class="screen">
+      <div class="screen-top"><b>Modelo 1 — Clássico vertical</b><em>A</em></div>
+      <div class="screen-desc">Tudo empilhado em faixas de largura total. O visitante rola e recebe a informação numa ordem única e fixa.</div>
+      <div class="canvas">
+        <div class="navbar"><span class="logo"></span><span class="links"><i></i><i></i><i></i><i></i></span><span class="cta"></span></div>
+
+        <div class="blk mb" style="padding:16px 12px">
+          <span class="lbl">Banner principal</span>
+          <div class="ln t w75"></div><div class="ln t w60"></div>
+          <div class="ln w90" style="margin-top:8px"></div><div class="ln w75"></div>
+          <div class="row" style="margin-top:12px"><div class="btn" style="width:74px">Inscrever</div><div class="btn ghost" style="width:74px">Programação</div></div>
+        </div>
+
+        <div class="blk mb"><span class="lbl">Sobre o evento</span>
+          <div class="ln w90"></div><div class="ln w75"></div><div class="ln w45"></div>
+        </div>
+
+        <div class="blk mb"><span class="lbl">Destaques — 3 colunas</span>
+          <div class="g3">
+            <div class="solid" style="height:52px"></div>
+            <div class="solid" style="height:52px"></div>
+            <div class="solid" style="height:52px"></div>
+          </div>
+        </div>
+
+        <div class="blk mb"><span class="lbl">Programação — lista</span>
+          <div class="col">
+            <div class="row"><div class="solid" style="width:34px;height:14px"></div><div class="ln w75" style="flex:1;margin:4px 0 0"></div></div>
+            <div class="row"><div class="solid" style="width:34px;height:14px"></div><div class="ln w90" style="flex:1;margin:4px 0 0"></div></div>
+            <div class="row"><div class="solid" style="width:34px;height:14px"></div><div class="ln w60" style="flex:1;margin:4px 0 0"></div></div>
+          </div>
+        </div>
+
+        <div class="blk mb"><span class="lbl">Palestrantes</span>
+          <div class="g4">
+            <div class="center"><div class="circ" style="width:100%;aspect-ratio:1"></div><div class="ln" style="margin-top:5px"></div></div>
+            <div class="center"><div class="circ" style="width:100%;aspect-ratio:1"></div><div class="ln" style="margin-top:5px"></div></div>
+            <div class="center"><div class="circ" style="width:100%;aspect-ratio:1"></div><div class="ln" style="margin-top:5px"></div></div>
+            <div class="center"><div class="circ" style="width:100%;aspect-ratio:1"></div><div class="ln" style="margin-top:5px"></div></div>
+          </div>
+        </div>
+
+        <div class="dark mb" style="padding:14px 12px;text-align:center">
+          <div class="ln t w60" style="margin:0 auto 8px;background:#E4E6EA"></div>
+          <div class="darker" style="height:22px;width:88px;margin:0 auto"></div>
+        </div>
+
+        <div class="blk" style="background:#F2F3F5"><span class="lbl">Rodapé</span>
+          <div class="g3"><div class="ln w90"></div><div class="ln w75"></div><div class="ln w60"></div></div>
+        </div>
+      </div>
+      <div class="pros">
+        <dl>
+          <dt>A favor</dt><dd>Previsível, fácil de construir e de ler no celular. Funciona bem quando o conteúdo é pouco.</dd>
+          <dt>Contra</dt><dd>Página fica longa; quem quer só a programação precisa rolar muito.</dd>
+          <dt>Indicado se</dt><dd>o objetivo principal é a inscrição e o conteúdo ainda está sendo definido.</dd>
+        </dl>
+      </div>
+    </div>
+
+    <!-- MODELO 2 -->
+    <div class="screen">
+      <div class="screen-top"><b>Modelo 2 — Banner dividido</b><em>B</em></div>
+      <div class="screen-desc">Topo em duas colunas: texto de um lado, cartão de inscrição fixo do outro. Dados práticos ficam visíveis já na primeira tela.</div>
+      <div class="canvas">
+        <div class="navbar"><span class="logo"></span><span class="links"><i></i><i></i><i></i><i></i></span><span class="cta"></span></div>
+
+        <div class="blk mb" style="padding:12px">
+          <span class="lbl">Banner 60 / 40</span>
+          <div class="row">
+            <div style="flex:1.4">
+              <div class="ln t w90"></div><div class="ln t w60"></div>
+              <div class="ln w90" style="margin-top:8px"></div><div class="ln w75"></div>
+              <div class="btn" style="width:70px;margin-top:10px">Inscrever</div>
+            </div>
+            <div style="flex:1" class="solid">
+              <div style="padding:8px">
+                <div class="ln w60" style="background:#B7BAC3"></div>
+                <div class="ln w90"></div><div class="ln w75"></div><div class="ln w60"></div>
+                <div class="note-in" style="margin-top:6px">data · local · vagas</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="blk mb"><span class="lbl">Faixa de números</span>
+          <div class="g4">
+            <div class="solid" style="height:34px"></div><div class="solid" style="height:34px"></div>
+            <div class="solid" style="height:34px"></div><div class="solid" style="height:34px"></div>
+          </div>
+        </div>
+
+        <div class="blk mb"><span class="lbl">Sobre — texto + imagem</span>
+          <div class="row">
+            <div style="flex:1"><div class="ln w90"></div><div class="ln w75"></div><div class="ln w90"></div><div class="ln w45"></div></div>
+            <div class="img" style="flex:1;min-height:64px"></div>
+          </div>
+        </div>
+
+        <div class="blk mb"><span class="lbl">Programação em abas</span>
+          <div class="row" style="margin-bottom:8px">
+            <div class="dark" style="height:16px;flex:1"></div>
+            <div class="solid" style="height:16px;flex:1"></div>
+            <div class="solid" style="height:16px;flex:1"></div>
+          </div>
+          <div class="col">
+            <div class="solid" style="height:20px"></div>
+            <div class="solid" style="height:20px"></div>
+            <div class="solid" style="height:20px"></div>
+          </div>
+        </div>
+
+        <div class="blk mb"><span class="lbl">Palestrantes — carrossel</span>
+          <div class="row">
+            <div class="solid" style="width:52px;height:62px"></div>
+            <div class="solid" style="width:52px;height:62px"></div>
+            <div class="solid" style="width:52px;height:62px"></div>
+            <div class="solid" style="width:22px;height:62px;opacity:.55"></div>
+          </div>
+        </div>
+
+        <div class="blk" style="background:#F2F3F5"><span class="lbl">Rodapé</span>
+          <div class="g3"><div class="ln w90"></div><div class="ln w75"></div><div class="ln w60"></div></div>
+        </div>
+      </div>
+      <div class="pros">
+        <dl>
+          <dt>A favor</dt><dd>Data, local e vagas aparecem sem rolagem. Abas encurtam muito a programação.</dd>
+          <dt>Contra</dt><dd>Exige atenção no celular — as duas colunas viram uma embaixo da outra.</dd>
+          <dt>Indicado se</dt><dd>o evento tem 3 dias de grade e as informações práticas são a dúvida mais comum.</dd>
+        </dl>
+      </div>
+    </div>
+
+    <!-- MODELO 3 -->
+    <div class="screen">
+      <div class="screen-top"><b>Modelo 3 — Menu lateral fixo</b><em>C</em></div>
+      <div class="screen-desc">Índice fixo à esquerda acompanha a rolagem; o conteúdo passa à direita. A programação vira uma linha do tempo vertical.</div>
+      <div class="canvas">
+        <div class="blk mb" style="padding:10px">
+          <span class="lbl">Banner curto, largura total</span>
+          <div class="ln t w75"></div><div class="ln w90" style="margin-top:6px"></div>
+          <div class="btn" style="width:70px;margin-top:9px">Inscrever</div>
+        </div>
+
+        <div class="row" style="align-items:stretch">
+          <!-- coluna do menu -->
+          <div class="blk" style="width:78px;flex:none;padding:9px">
+            <span class="lbl" style="font-size:8.5px">Índice fixo</span>
+            <div class="col" style="gap:6px">
+              <div class="dark" style="height:11px"></div>
+              <div class="solid" style="height:11px"></div>
+              <div class="solid" style="height:11px"></div>
+              <div class="solid" style="height:11px"></div>
+              <div class="solid" style="height:11px"></div>
+            </div>
+            <div class="note-in" style="margin-top:8px">acompanha<br>a rolagem</div>
+          </div>
+
+          <!-- conteúdo -->
+          <div class="stack" style="flex:1">
+            <div class="blk"><span class="lbl">Sobre</span>
+              <div class="ln w90"></div><div class="ln w75"></div><div class="ln w45"></div>
+            </div>
+
+            <div class="blk"><span class="lbl">Programação — linha do tempo</span>
+              <div style="position:relative;padding-left:16px">
+                <div style="position:absolute;left:5px;top:4px;bottom:4px;width:2px;background:#D3D5DA"></div>
+                <div style="position:relative;margin-bottom:9px">
+                  <span style="position:absolute;left:-14px;top:3px;width:8px;height:8px;border-radius:50%;background:#8A8E99"></span>
+                  <div class="ln t2 w60"></div><div class="ln w90"></div>
+                </div>
+                <div style="position:relative;margin-bottom:9px">
+                  <span style="position:absolute;left:-14px;top:3px;width:8px;height:8px;border-radius:50%;background:#8A8E99"></span>
+                  <div class="ln t2 w45"></div><div class="ln w75"></div>
+                </div>
+                <div style="position:relative">
+                  <span style="position:absolute;left:-14px;top:3px;width:8px;height:8px;border-radius:50%;background:#8A8E99"></span>
+                  <div class="ln t2 w60"></div><div class="ln w90"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="blk"><span class="lbl">Palestrantes — lista</span>
+              <div class="col" style="gap:7px">
+                <div class="row"><div class="circ" style="width:22px;height:22px;flex:none"></div><div style="flex:1"><div class="ln w60"></div><div class="ln w90"></div></div></div>
+                <div class="row"><div class="circ" style="width:22px;height:22px;flex:none"></div><div style="flex:1"><div class="ln w45"></div><div class="ln w75"></div></div></div>
+                <div class="row"><div class="circ" style="width:22px;height:22px;flex:none"></div><div style="flex:1"><div class="ln w60"></div><div class="ln w90"></div></div></div>
+              </div>
+            </div>
+
+            <div class="blk"><span class="lbl">Local + mapa</span>
+              <div class="img" style="height:44px"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="blk" style="background:#F2F3F5;margin-top:10px"><span class="lbl">Rodapé</span>
+          <div class="g3"><div class="ln w90"></div><div class="ln w75"></div><div class="ln w60"></div></div>
+        </div>
+      </div>
+      <div class="pros">
+        <dl>
+          <dt>A favor</dt><dd>Dá para pular direto para qualquer seção; a linha do tempo lê muito bem uma grade por horário.</dd>
+          <dt>Contra</dt><dd>O menu lateral some no celular (vira menu comum) e o layout dá mais trabalho para montar.</dd>
+          <dt>Indicado se</dt><dd>o site vai ter bastante conteúdo e servir de consulta durante o evento.</dd>
+        </dl>
+      </div>
+    </div>
+
+    <!-- MODELO 4 -->
+    <div class="screen">
+      <div class="screen-top"><b>Modelo 4 — Mosaico modular</b><em>D</em></div>
+      <div class="screen-desc">Cartões de tamanhos diferentes num grid. Cada assunto é um módulo independente, sem ordem obrigatória de leitura.</div>
+      <div class="canvas">
+        <div class="navbar"><span class="logo"></span><span class="links"><i></i><i></i><i></i></span><span class="cta"></span></div>
+
+        <div class="dark mb" style="padding:14px 12px">
+          <div class="ln t w75" style="background:#E4E6EA"></div>
+          <div class="ln w60" style="background:#B7BAC3;margin-top:6px"></div>
+          <div class="darker" style="height:22px;width:76px;margin-top:10px"></div>
+        </div>
+
+        <span class="lbl">Grid de módulos</span>
+        <div class="g2 mb">
+          <div class="blk" style="grid-row:span 2;min-height:110px">
+            <span class="lbl">Programação</span>
+            <div class="col" style="gap:6px">
+              <div class="solid" style="height:16px"></div>
+              <div class="solid" style="height:16px"></div>
+              <div class="solid" style="height:16px"></div>
+              <div class="solid" style="height:16px"></div>
+            </div>
+          </div>
+          <div class="blk" style="min-height:50px"><span class="lbl">Data e local</span><div class="ln w90"></div><div class="ln w60"></div></div>
+          <div class="img" style="min-height:50px"></div>
+        </div>
+
+        <div class="g3 mb">
+          <div class="blk" style="min-height:56px"><span class="lbl">Oficinas</span><div class="ln w90"></div><div class="ln w60"></div></div>
+          <div class="blk" style="min-height:56px"><span class="lbl">Submissão</span><div class="ln w90"></div><div class="ln w60"></div></div>
+          <div class="blk" style="min-height:56px"><span class="lbl">Certificado</span><div class="ln w90"></div><div class="ln w60"></div></div>
+        </div>
+
+        <div class="g2 mb">
+          <div class="blk"><span class="lbl">Palestrantes</span>
+            <div class="row"><div class="circ" style="width:22px;height:22px"></div><div class="circ" style="width:22px;height:22px"></div><div class="circ" style="width:22px;height:22px"></div></div>
+          </div>
+          <div class="dark" style="padding:10px">
+            <div class="ln w75" style="background:#E4E6EA"></div>
+            <div class="darker" style="height:18px;width:60px;margin-top:8px"></div>
+          </div>
+        </div>
+
+        <div class="blk" style="background:#F2F3F5"><span class="lbl">Rodapé</span>
+          <div class="g3"><div class="ln w90"></div><div class="ln w75"></div><div class="ln w60"></div></div>
+        </div>
+      </div>
+      <div class="pros">
+        <dl>
+          <dt>A favor</dt><dd>Visualmente mais dinâmico; cada módulo pode ser adicionado ou removido sem quebrar o resto.</dd>
+          <dt>Contra</dt><dd>Sem hierarquia clara, o olho se perde. Precisa de disciplina no uso da cor de destaque.</dd>
+          <dt>Indicado se</dt><dd>há muitos assuntos de peso parecido e a página deve parecer um painel.</dd>
+        </dl>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ================= VARIAÇÕES DE BLOCO ================= -->
+  <h2 class="sec">Parte 2 · Variações do banner principal</h2>
+  <div class="variants">
+
+    <div class="variant">
+      <div class="variant-head"><b>B1 — Centralizado</b><p>Título grande no centro, botões abaixo. Máximo impacto, mínima informação.</p></div>
+      <div class="variant-body">
+        <div class="blk center" style="padding:20px 14px">
+          <div class="ln t w60" style="margin:0 auto 6px"></div>
+          <div class="ln t w45" style="margin:0 auto 10px"></div>
+          <div class="ln w75" style="margin:0 auto 4px"></div>
+          <div class="ln w60" style="margin:0 auto 12px"></div>
+          <div class="row" style="justify-content:center"><div class="btn" style="width:76px">Inscrever</div><div class="btn ghost" style="width:76px">Saiba mais</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="variant">
+      <div class="variant-head"><b>B2 — Texto + foto</b><p>Metade texto, metade imagem do campus ou de edição anterior.</p></div>
+      <div class="variant-body">
+        <div class="blk" style="padding:14px">
+          <div class="row">
+            <div style="flex:1">
+              <div class="ln t w90"></div><div class="ln t w60"></div>
+              <div class="ln w90" style="margin-top:8px"></div><div class="ln w75"></div>
+              <div class="btn" style="width:72px;margin-top:10px">Inscrever</div>
+            </div>
+            <div class="img" style="flex:1;min-height:96px"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="variant">
+      <div class="variant-head"><b>B3 — Com barra de dados</b><p>Título à esquerda e, abaixo, faixa com data, local, vagas e valor.</p></div>
+      <div class="variant-body">
+        <div class="blk" style="padding:14px">
+          <div class="ln t w75"></div><div class="ln t w45"></div>
+          <div class="ln w90" style="margin-top:8px"></div><div class="ln w60"></div>
+          <div class="btn" style="width:72px;margin:10px 0"></div>
+          <div class="g4">
+            <div class="solid" style="height:30px"></div><div class="solid" style="height:30px"></div>
+            <div class="solid" style="height:30px"></div><div class="solid" style="height:30px"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="variant">
+      <div class="variant-head"><b>B4 — Com contagem regressiva</b><p>Título, cronômetro até a abertura e botão. Cria urgência para a inscrição.</p></div>
+      <div class="variant-body">
+        <div class="blk center" style="padding:16px 14px">
+          <div class="ln t w60" style="margin:0 auto 10px"></div>
+          <div class="row" style="justify-content:center;margin-bottom:10px">
+            <div class="solid" style="width:34px;height:38px"></div>
+            <div class="solid" style="width:34px;height:38px"></div>
+            <div class="solid" style="width:34px;height:38px"></div>
+            <div class="solid" style="width:34px;height:38px"></div>
+          </div>
+          <div class="btn" style="width:86px;margin:0 auto">Inscrever</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <h2 class="sec">Parte 3 · Variações da programação</h2>
+  <div class="variants">
+
+    <div class="variant">
+      <div class="variant-head"><b>P1 — Lista por horário</b><p>Hora à esquerda, atividade ao lado. Simples e imprime bem.</p></div>
+      <div class="variant-body">
+        <div class="blk" style="padding:12px">
+          <div class="col" style="gap:9px">
+            <div class="row"><div class="solid" style="width:38px;height:16px;flex:none"></div><div style="flex:1"><div class="ln t2 w75"></div><div class="ln w45"></div></div></div>
+            <div class="row"><div class="solid" style="width:38px;height:16px;flex:none"></div><div style="flex:1"><div class="ln t2 w90"></div><div class="ln w60"></div></div></div>
+            <div class="row"><div class="solid" style="width:38px;height:16px;flex:none"></div><div style="flex:1"><div class="ln t2 w60"></div><div class="ln w45"></div></div></div>
+            <div class="row"><div class="solid" style="width:38px;height:16px;flex:none"></div><div style="flex:1"><div class="ln t2 w75"></div><div class="ln w60"></div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="variant">
+      <div class="variant-head"><b>P2 — Abas por dia</b><p>Um clique troca o dia. Encurta a página quando são 3 dias de grade.</p></div>
+      <div class="variant-body">
+        <div class="blk" style="padding:12px">
+          <div class="row" style="margin-bottom:10px">
+            <div class="dark" style="height:18px;flex:1"></div>
+            <div class="solid" style="height:18px;flex:1"></div>
+            <div class="solid" style="height:18px;flex:1"></div>
+          </div>
+          <div class="col" style="gap:7px">
+            <div class="solid" style="height:22px"></div>
+            <div class="solid" style="height:22px"></div>
+            <div class="solid" style="height:22px"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="variant">
+      <div class="variant-head"><b>P3 — Grade tipo agenda</b><p>Dias nas colunas, horários nas linhas. Mostra as atividades simultâneas.</p></div>
+      <div class="variant-body">
+        <div class="blk" style="padding:12px">
+          <div style="display:grid;grid-template-columns:30px repeat(3,1fr);gap:5px">
+            <div></div>
+            <div class="dark" style="height:14px"></div><div class="dark" style="height:14px"></div><div class="dark" style="height:14px"></div>
+            <div class="ln w90" style="margin:5px 0 0"></div>
+            <div class="solid" style="height:26px"></div><div class="solid" style="height:26px"></div><div class="solid" style="height:26px"></div>
+            <div class="ln w90" style="margin:5px 0 0"></div>
+            <div class="solid" style="height:26px"></div><div class="solid" style="height:26px;opacity:.45"></div><div class="solid" style="height:26px"></div>
+            <div class="ln w90" style="margin:5px 0 0"></div>
+            <div class="solid" style="height:26px"></div><div class="solid" style="height:26px"></div><div class="solid" style="height:26px;opacity:.45"></div>
+          </div>
+          <div class="note-in" style="margin-top:8px">difícil de ler no celular — precisa virar lista</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="variant">
+      <div class="variant-head"><b>P4 — Sanfona por bloco</b><p>Cada período fechado; o visitante abre só o que interessa.</p></div>
+      <div class="variant-body">
+        <div class="blk" style="padding:12px">
+          <div class="col" style="gap:7px">
+            <div class="row" style="align-items:center"><div class="ln t2 w60" style="flex:1;margin:0"></div><div class="solid" style="width:14px;height:14px;flex:none"></div></div>
+            <div class="solid" style="height:44px"></div>
+            <div class="row" style="align-items:center"><div class="ln t2 w45" style="flex:1;margin:0"></div><div class="solid" style="width:14px;height:14px;flex:none"></div></div>
+            <div class="row" style="align-items:center"><div class="ln t2 w75" style="flex:1;margin:0"></div><div class="solid" style="width:14px;height:14px;flex:none"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <h2 class="sec">Parte 4 · Como fica no celular</h2>
+  <div class="variants">
+
+    <div class="variant">
+      <div class="variant-head"><b>M1 — Empilhamento direto</b><p>As colunas do desktop viram uma embaixo da outra, na mesma ordem.</p></div>
+      <div class="variant-body" style="display:flex;justify-content:center">
+        <div class="wf" style="width:150px;padding:9px;border-radius:14px">
+          <div class="row" style="align-items:center;margin-bottom:8px"><div class="solid" style="width:26px;height:11px"></div><div style="flex:1"></div><div class="dark" style="width:14px;height:11px"></div></div>
+          <div class="blk" style="padding:8px;margin-bottom:7px"><div class="ln t w90"></div><div class="ln w75" style="margin-top:5px"></div><div class="btn" style="width:60px;height:18px;margin-top:7px"></div></div>
+          <div class="solid" style="height:26px;margin-bottom:7px"></div>
+          <div class="solid" style="height:36px;margin-bottom:7px"></div>
+          <div class="solid" style="height:36px;margin-bottom:7px"></div>
+          <div class="dark" style="height:26px"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="variant">
+      <div class="variant-head"><b>M2 — Com botão fixo</b><p>Barra de inscrição colada no rodapé da tela, sempre visível durante a rolagem.</p></div>
+      <div class="variant-body" style="display:flex;justify-content:center">
+        <div class="wf" style="width:150px;padding:9px;border-radius:14px;position:relative">
+          <div class="row" style="align-items:center;margin-bottom:8px"><div class="solid" style="width:26px;height:11px"></div><div style="flex:1"></div><div class="dark" style="width:14px;height:11px"></div></div>
+          <div class="blk" style="padding:8px;margin-bottom:7px"><div class="ln t w90"></div><div class="ln w75" style="margin-top:5px"></div></div>
+          <div class="solid" style="height:30px;margin-bottom:7px"></div>
+          <div class="solid" style="height:40px;margin-bottom:7px"></div>
+          <div class="solid" style="height:30px;margin-bottom:34px"></div>
+          <div class="darker" style="position:absolute;left:9px;right:9px;bottom:9px;height:24px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px;font-weight:700;letter-spacing:.08em">INSCREVA-SE</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <p class="footnote"><b>Como usar isto:</b> escolha um modelo da Parte 1 como estrutura geral e, dentro dele, uma variação de banner (Parte 2) e uma de programação (Parte 3) — eles se combinam livremente. Depois de fechada a disposição, aplico a paleta escolhida e monto a versão final. Os blocos cinzas são só posição e tamanho: nenhum tipo de letra, cor ou foto aqui é definitivo.</p>
+
+</div>
+</body>
+</html>

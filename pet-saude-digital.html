@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PET Saúde Digital — UEPA</title>
+
+<!--
+  ============================================================================
+  PET SAÚDE DIGITAL — SPA (React + Tailwind CSS)
+  ============================================================================
+  Este arquivo é a base de código pedida no planejamento: um único documento
+  que roda direto no navegador (sem precisar de Node/npm), usando:
+    - React 18 (UMD) + ReactDOM ......... biblioteca de componentes
+    - Babel Standalone .................. compila o JSX no próprio navegador
+    - Tailwind CSS (CDN) ................ utilitários de estilo
+
+  Estrutura de pastas sugerida para portar isto a um projeto Vite/CRA real:
+    src/
+      App.jsx                 -> componente <App/> (estado das abas)
+      components/
+        Header.jsx             -> logo, menu de abas, CTA de inscrição
+        About.jsx               -> <Sobre/>
+        Schedule.jsx            -> <Programacao/>
+        Speakers.jsx            -> <Palestrantes/>
+        Submissions.jsx         -> <Submissao/>
+        Location.jsx            -> <Local/>
+        Sponsors.jsx            -> <Patrocinadores/>
+        Contact.jsx             -> <Contato/>
+        Footer.jsx              -> rodapé com logo da UEPA
+
+  REGRA DE NEGÓCIO CENTRAL (definida pelo cliente, Prof. Anderson):
+  o site é uma SPA de abas — o menu fica fixo, o conteúdo troca por
+  renderização condicional via useState, e a página não deve exigir rolagem
+  longa. Cada aba, internamente, pode ter um scroll próprio se o conteúdo
+  não couber, mas a navegação entre seções nunca rola a página toda.
+
+  DADOS: todos os nomes, textos, valores e contatos abaixo são FICTÍCIOS,
+  gerados para fins de protótipo, conforme alinhado nas reuniões de
+  levantamento de requisitos com o cliente.
+  ============================================================================
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.24.7/babel.min.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  // Aviso visível caso alguma das bibliotecas acima não carregue (ex.: sem
+  // internet no momento em que o arquivo foi aberto). Sem isso, a falha de
+  // um <script> externo resulta apenas em tela branca e nenhum erro visível.
+  window.addEventListener("load", function () {
+    setTimeout(function () {
+      var root = document.getElementById("root");
+      if (root && root.innerHTML.trim() === "") {
+        root.innerHTML =
+          '<div style="max-width:520px;margin:60px auto;padding:20px 24px;' +
+          'font-family:sans-serif;background:#FFF6E5;border:1px solid #F0D9A8;' +
+          'border-radius:10px;color:#6B5220;">' +
+          '<b>A página não carregou corretamente.</b><br><br>' +
+          'Este arquivo depende de bibliotecas (React, Babel, Tailwind) carregadas ' +
+          'pela internet a partir de um CDN. Verifique sua conexão e recarregue a ' +
+          'página. Se o problema persistir, abra o Console do navegador (F12) e ' +
+          'veja qual arquivo falhou em carregar.</div>';
+      }
+    }, 2500);
+  });
+</script>
+<script>
+  // ---- Paleta B (PET-Saúde Digital) e tipografia Opção 6 (IBM Plex Sans única) ----
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          pet: {
+            blue:      '#173C5E', // primária
+            blueDark:  '#0E2740', // primária escura (rodapé, texto)
+            orange:    '#E8531C', // destaque / CTA
+            sky:       '#5BA3D9', // apoio
+            ice:       '#E7F1F9', // fundo suave
+          }
+        },
+        fontFamily: {
+          sans: ['IBM Plex Sans', 'Segoe UI', 'system-ui', 'sans-serif'],
+        }
+      }
+    }
+  };
+</script>
+
+<style>
+  html, body, #root { height: 100%; }
+  body { font-family: 'IBM Plex Sans', system-ui, sans-serif; }
+  /* esconde a barra de rolagem do menu de abas no mobile sem esconder a função */
+  .tabs-scroll::-webkit-scrollbar { display: none; }
+  .tabs-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+</style>
+</head>
+<body class="bg-pet-ice text-pet-blueDark">
+<div id="root"></div>
+
+<script type="text/babel" data-presets="react">
+const { useState } = React;
+
+/* ============================================================================
+   DADOS FICTÍCIOS DO EVENTO
+   Em uma versão futura isto pode virar um arquivo separado (ex: data.js) ou
+   vir de um CMS/planilha — hoje está aqui em memória para simplificar o
+   protótipo dentro do prazo de uma semana.
+   ============================================================================ */
+
+const EVENTO = {
+  nome: "I Simpósio PET Saúde Digital",
+  instituicao: "UEPA — Universidade do Estado do Pará",
+  data: "12 e 13 de outubro de 2026 (segunda e terça-feira)",
+  horario: "08h às 17h",
+  local: "Campus Central da UEPA — Belém/PA",
+  valorInscricao: "R$ 15,00",
+  whatsapp: "5591991234567", // fictício, formato E.164 sem "+"
+  whatsappExibicao: "(91) 99123-4567",
+  email: "petsaudedigital@uepa.br",
+};
+
+const LINK_WHATSAPP_INSCRICAO = `https://wa.me/${EVENTO.whatsapp}?text=${encodeURIComponent(
+  "Olá! Gostaria de me inscrever no I Simpósio PET Saúde Digital (UEPA)."
+)}`;
+
+const LINK_WHATSAPP_SUBMISSAO = `https://wa.me/${EVENTO.whatsapp}?text=${encodeURIComponent(
+  "Olá! Tenho uma dúvida sobre a submissão de artigos para o I Simpósio PET Saúde Digital."
+)}`;
+
+const LINK_EMAIL_SUBMISSAO = `mailto:${EVENTO.email}?subject=${encodeURIComponent(
+  "Submissão de artigo — I Simpósio PET Saúde Digital"
+)}`;
+
+// Palestrantes (fictícios) — usados tanto na aba "Palestrantes" quanto
+// referenciados por nome dentro da grade de Programação.
+const PALESTRANTES = [
+  {
+    id: "camila-andrade",
+    nome: "Profª Drª Camila Rocha Andrade",
+    cargo: "Coordenadora Geral do PET Saúde Digital",
+    instituicao: "UEPA — Depto. de Saúde Coletiva",
+    bio: "Doutora em Saúde Coletiva pela UFPA, com atuação em telessaúde e gestão da informação em saúde na Amazônia. Coordena o PET Saúde Digital desde 2024.",
+    iniciais: "CA",
+  },
+  {
+    id: "marcos-lima",
+    nome: "Prof. Dr. Marcos Vinícius Tavares Lima",
+    cargo: "Docente do curso de Medicina",
+    instituicao: "UEPA — Campus Belém",
+    bio: "Doutor em Epidemiologia, pesquisador em atenção primária à saúde e uso de tecnologias de informação na rede básica do SUS.",
+    iniciais: "ML",
+  },
+  {
+    id: "rafael-bittencourt",
+    nome: "Prof. Me. Rafael Souza Bittencourt",
+    cargo: "Docente do curso de Sistemas de Informação",
+    instituicao: "UEPA — Campus Belém",
+    bio: "Mestre em Ciência da Computação, ministra disciplinas de programação aplicada e orienta projetos de extensão com Python voltados à saúde pública.",
+    iniciais: "RB",
+  },
+  {
+    id: "luana-costa",
+    nome: "Profª Drª Luana Ferreira Costa",
+    cargo: "Docente do curso de Enfermagem",
+    instituicao: "UEPA — Campus Belém",
+    bio: "Doutora em Enfermagem, com pesquisas voltadas à telessaúde e ao cuidado de populações ribeirinhas da região Norte.",
+    iniciais: "LC",
+  },
+  {
+    id: "anderson-souza",
+    nome: "Prof. Pós Dr. José Matheus R. S. Filho",
+    cargo: "Coordenador Adjunto do PET Saúde Digital",
+    instituicao: "UEPA — Depto. de Tecnologia da Informação",
+    bio: "Doutor em Engenharia da Computação, atua em projetos de transformação digital em saúde e mediação de debates interdisciplinares sobre dados e equidade.",
+    iniciais: "AS",
+  },
+  {
+    id: "henrique-nogueira",
+    nome: "Prof. Dr. Henrique Salgado Nogueira",
+    cargo: "Docente convidado",
+    instituicao: "Instituto Amazônia Digital",
+    bio: "Doutor em Engenharia Biomédica, pesquisa aplicações de inteligência artificial em diagnóstico por imagem.",
+    iniciais: "HN",
+  },
+  {
+    id: "beatriz-ribeiro",
+    nome: "Profª Ma. Beatriz Almeida Ribeiro",
+    cargo: "Docente do curso de Estatística",
+    instituicao: "UEPA — Campus Belém",
+    bio: "Mestra em Bioestatística, atua com visualização e análise de dados em saúde utilizando Python.",
+    iniciais: "BR",
+  },
+  {
+    id: "igor-farias",
+    nome: "Prof. Dr. Igor Cardoso Farias",
+    cargo: "Docente do curso de Direito",
+    instituicao: "UEPA — Campus Belém",
+    bio: "Doutor em Direito Digital, com pesquisas sobre proteção de dados pessoais (LGPD) aplicada a sistemas de informação em saúde.",
+    iniciais: "IF",
+  },
+];
+
+const porId = (id) => PALESTRANTES.find((p) => p.id === id);
+
+// Programação — organizada por dia > turno > item.
+// Cada item pode ser expandido (clique) para revelar detalhes adicionais,
+// conforme pedido pelo cliente na entrevista de validação.
+const PROGRAMACAO = [
+  {
+    dia: "Segunda-feira",
+    data: "12/10/2026",
+    turnos: [
+      {
+        turno: "Manhã",
+        horario: "08h às 12h",
+        itens: [
+          {
+            horario: "08h00 – 08h30",
+            titulo: "Credenciamento",
+            palestrante: null,
+            local: "Recepção do Auditório Central",
+            detalhes: "Retirada de crachá e material do evento. Chegue com 15 minutos de antecedência.",
+          },
+          {
+            horario: "08h30 – 09h00",
+            titulo: "Abertura oficial",
+            palestranteId: "camila-andrade",
+            local: "Auditório Central",
+            detalhes: "Apresentação institucional do PET Saúde Digital e boas-vindas da coordenação.",
+          },
+          {
+            horario: "09h00 – 10h00",
+            titulo: "Palestra: Saúde Digital na Atenção Primária — desafios e oportunidades",
+            palestranteId: "marcos-lima",
+            local: "Auditório Central",
+            detalhes: "Panorama do uso de prontuários eletrônicos e sistemas de apoio à decisão na rede básica do SUS.",
+          },
+          {
+            horario: "10h00 – 10h20",
+            titulo: "Intervalo",
+            palestrante: null,
+            local: "Hall do Auditório",
+            detalhes: "Coffee break oferecido pela organização.",
+          },
+          {
+            horario: "10h20 – 12h00",
+            titulo: "Minicurso: Introdução ao Python aplicado à saúde (Parte 1)",
+            palestranteId: "rafael-bittencourt",
+            local: "Laboratório de Informática 2",
+            detalhes: "Fundamentos de Python e manipulação de dados de saúde com a biblioteca Pandas. Traga notebook, se possível.",
+          },
+        ],
+      },
+      {
+        turno: "Tarde",
+        horario: "13h às 17h",
+        itens: [
+          {
+            horario: "13h00 – 14h30",
+            titulo: "Minicurso: Introdução ao Python aplicado à saúde (Parte 2)",
+            palestranteId: "rafael-bittencourt",
+            local: "Laboratório de Informática 2",
+            detalhes: "Continuação da Parte 1, com exercícios práticos sobre uma base de dados fictícia de atendimentos.",
+          },
+          {
+            horario: "14h30 – 15h30",
+            titulo: "Palestra: Telessaúde e o cuidado a populações ribeirinhas na Amazônia",
+            palestranteId: "luana-costa",
+            local: "Auditório Central",
+            detalhes: "Estudos de caso de teleconsulta e teleorientação em municípios ribeirinhos do Pará.",
+          },
+          {
+            horario: "15h30 – 15h50",
+            titulo: "Intervalo",
+            palestrante: null,
+            local: "Hall do Auditório",
+            detalhes: "Coffee break oferecido pela organização.",
+          },
+          {
+            horario: "15h50 – 17h00",
+            titulo: "Mesa-redonda: Tecnologia, dados e equidade em saúde",
+            palestranteId: "anderson-souza",
+            local: "Sala de Convivência",
+            detalhes: "Debate aberto com participação do público sobre acesso desigual à saúde digital na região Norte.",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    dia: "Terça-feira",
+    data: "13/10/2026",
+    turnos: [
+      {
+        turno: "Manhã",
+        horario: "08h às 12h",
+        itens: [
+          {
+            horario: "08h00 – 09h00",
+            titulo: "Apresentação de projetos do PET Saúde Digital",
+            palestrante: null,
+            local: "Auditório Central",
+            detalhes: "Bolsistas do programa apresentam o andamento dos projetos desenvolvidos ao longo do ano.",
+          },
+          {
+            horario: "09h00 – 10h00",
+            titulo: "Palestra: Inteligência Artificial aplicada ao diagnóstico por imagem",
+            palestranteId: "henrique-nogueira",
+            local: "Auditório Central",
+            detalhes: "Exemplos de modelos de IA usados em radiologia e os desafios de adoção em hospitais públicos.",
+          },
+          {
+            horario: "10h00 – 10h20",
+            titulo: "Intervalo",
+            palestrante: null,
+            local: "Hall do Auditório",
+            detalhes: "Coffee break oferecido pela organização.",
+          },
+          {
+            horario: "10h20 – 12h00",
+            titulo: "Minicurso: Visualização de dados em saúde com Python",
+            palestranteId: "beatriz-ribeiro",
+            local: "Laboratório de Informática 1",
+            detalhes: "Construção de gráficos com Pandas e Matplotlib a partir de indicadores de saúde pública.",
+          },
+        ],
+      },
+      {
+        turno: "Tarde",
+        horario: "13h às 17h",
+        itens: [
+          {
+            horario: "13h00 – 14h30",
+            titulo: "Oficina: Segurança e privacidade de dados em saúde (LGPD)",
+            palestranteId: "igor-farias",
+            local: "Sala 204",
+            detalhes: "Boas práticas de proteção de dados pessoais sensíveis em sistemas de informação em saúde.",
+          },
+          {
+            horario: "14h30 – 15h30",
+            titulo: "Palestra: Prontuário eletrônico e interoperabilidade no SUS",
+            palestranteId: "camila-andrade",
+            local: "Auditório Central",
+            detalhes: "Desafios de integração entre sistemas de saúde municipais, estaduais e federais.",
+          },
+          {
+            horario: "15h30 – 15h50",
+            titulo: "Intervalo",
+            palestrante: null,
+            local: "Hall do Auditório",
+            detalhes: "Coffee break oferecido pela organização.",
+          },
+          {
+            horario: "15h50 – 17h00",
+            titulo: "Apresentação de artigos submetidos e encerramento",
+            palestrante: null,
+            local: "Auditório Central",
+            detalhes: "Leitura dos artigos selecionados pela comissão científica, seguida da entrega de certificados.",
+          },
+        ],
+      },
+    ],
+  },
+];
+
+const PATROCINADORES = [
+  { nome: "TechSaúde Soluções Digitais", cor: "bg-pet-blue" },
+  { nome: "Hospital Metropolitano de Belém", cor: "bg-pet-blueDark" },
+  { nome: "Instituto Amazônia Digital", cor: "bg-pet-sky" },
+];
+
+const PARCEIROS = [
+  { nome: "Liga Acadêmica de Informática em Saúde (LAIS-UEPA)" },
+  { nome: "Sociedade Paraense de Informática Médica" },
+  { nome: "Secretaria Municipal de Saúde de Belém (SESMA)" },
+];
+
+/* ============================================================================
+   COMPONENTES DE UI REUTILIZÁVEIS
+   ============================================================================ */
+
+function SectionTitle({ eyebrow, title, children }) {
+  return (
+    <div className="mb-6">
+      {eyebrow && (
+        <span className="inline-block text-[11px] font-semibold tracking-[0.13em] uppercase text-pet-orange mb-2">
+          {eyebrow}
+        </span>
+      )}
+      <h2 className="text-2xl sm:text-3xl font-semibold text-pet-blueDark tracking-tight">
+        {title}
+      </h2>
+      {children && <p className="mt-2 text-sm text-slate-600 max-w-2xl">{children}</p>}
+    </div>
+  );
+}
+
+function Pill({ children, tone = "blue" }) {
+  const tones = {
+    blue: "bg-pet-ice text-pet-blue",
+    orange: "bg-orange-50 text-pet-orange",
+  };
+  return (
+    <span className={`inline-block text-[11px] font-semibold tracking-[0.1em] uppercase px-2.5 py-1 rounded-md ${tones[tone]}`}>
+      {children}
+    </span>
+  );
+}
+
+/* ============================================================================
+   ABA: SOBRE O EVENTO  (<About/>)
+   ============================================================================ */
+
+function About() {
+  return (
+    <div className="max-w-3xl mx-auto space-y-8">
+      <SectionTitle eyebrow="Sobre o evento" title={EVENTO.nome}>
+        Programa de Educação pelo Trabalho para a Saúde — Saúde Digital, promovido pela UEPA.
+      </SectionTitle>
+
+      <div className="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 space-y-4">
+        <p className="text-[15px] leading-relaxed text-slate-700">
+          O <strong>PET Saúde Digital</strong> é um programa de educação pelo trabalho da
+          Universidade do Estado do Pará (UEPA) que integra estudantes, docentes e profissionais
+          de saúde em torno do uso de tecnologia para qualificar o cuidado em saúde na região
+          Norte. O <strong>{EVENTO.nome}</strong> reúne, pela primeira vez, os projetos
+          desenvolvidos pelo programa — incluindo aplicações de Python voltadas à análise de
+          dados em saúde — além de minicursos, palestras e um espaço de submissão de artigos
+          científicos.
+        </p>
+        <p className="text-[15px] leading-relaxed text-slate-700">
+          O evento é aberto à comunidade acadêmica da UEPA e a profissionais e estudantes das
+          áreas de saúde e tecnologia da região metropolitana de Belém, com foco em fortalecer o
+          diálogo entre essas duas áreas.
+        </p>
+      </div>
+
+      <div>
+        <h3 className="text-xs font-semibold tracking-[0.13em] uppercase text-slate-500 mb-3">
+          Objetivos
+        </h3>
+        <ul className="grid sm:grid-cols-2 gap-3">
+          {[
+            "Divulgar o andamento dos projetos do PET Saúde Digital.",
+            "Aproximar tecnologia (com destaque para Python) e prática em saúde.",
+            "Oferecer minicursos práticos de formação técnica aos participantes.",
+            "Receber e valorizar a submissão de artigos científicos da área.",
+          ].map((obj, i) => (
+            <li key={i} className="flex gap-3 bg-pet-ice rounded-lg p-3 text-sm text-pet-blueDark">
+              <span className="flex-none w-6 h-6 rounded-md bg-pet-blue text-white text-xs font-semibold grid place-items-center">
+                {i + 1}
+              </span>
+              <span className="pt-0.5">{obj}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div>
+        <h3 className="text-xs font-semibold tracking-[0.13em] uppercase text-slate-500 mb-3">
+          Coordenação — currículo resumido
+        </h3>
+        <div className="grid sm:grid-cols-2 gap-4">
+          {[porId("camila-andrade"), porId("anderson-souza")].map((p) => (
+            <div key={p.id} className="bg-white rounded-xl border border-slate-200 p-4">
+              <p className="font-semibold text-pet-blueDark text-sm">{p.nome}</p>
+              <p className="text-xs text-pet-orange font-medium mt-0.5">{p.cargo}</p>
+              <p className="text-xs text-slate-500 mt-1">{p.instituicao}</p>
+              <p className="text-sm text-slate-600 mt-2 leading-relaxed">{p.bio}</p>
+            </div>
+          ))}
+        </div>
+        <p className="text-xs text-slate-400 mt-3">
+          Textos elaborados a partir de informações fictícias, no estilo de um currículo Lattes,
+          para fins de protótipo.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================================
+   ABA: PROGRAMAÇÃO  (<Schedule/>)
+   ============================================================================ */
+
+function ScheduleItem({ item }) {
+  const [aberto, setAberto] = useState(false);
+  const palestrante = item.palestranteId ? porId(item.palestranteId) : null;
+
+  return (
+    <li className="border border-slate-200 rounded-lg bg-white overflow-hidden">
+      <button
+        onClick={() => setAberto((v) => !v)}
+        className="w-full flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-4 text-left px-4 py-3 hover:bg-pet-ice/60 transition-colors"
+      >
+        <span className="text-xs font-semibold text-pet-blue w-full sm:w-28 flex-none">
+          {item.horario}
+        </span>
+        <span className="flex-1 text-sm font-medium text-pet-blueDark">{item.titulo}</span>
+        <span className="text-xs text-slate-500 flex-none">
+          {palestrante ? palestrante.nome.replace(/^Prof[ª.]?\.?\s?(Dr|Dra|Me|Ma)?\.?\s?/, "") : ""}
+        </span>
+        <span className="text-pet-orange text-xs font-bold flex-none">{aberto ? "–" : "+"}</span>
+      </button>
+      {aberto && (
+        <div className="px-4 pb-4 pt-1 border-t border-slate-100 text-sm text-slate-600 space-y-1.5">
+          {palestrante && (
+            <p><strong className="text-pet-blueDark">Palestrante:</strong> {palestrante.nome} — {palestrante.instituicao}</p>
+          )}
+          <p><strong className="text-pet-blueDark">Local:</strong> {item.local}</p>
+          <p>{item.detalhes}</p>
+        </div>
+      )}
+    </li>
+  );
+}
+
+function Schedule() {
+  const [diaAtivo, setDiaAtivo] = useState(0);
+
+  return (
+    <div className="max-w-3xl mx-auto">
+      <SectionTitle eyebrow="Programação" title="Grade do evento">
+        {EVENTO.data} · {EVENTO.horario}. Clique em um item para ver mais detalhes.
+      </SectionTitle>
+
+      {/* Sub-navegação por dia — evita repetir scroll longo, troca só o dia */}
+      <div className="flex gap-2 mb-5">
+        {PROGRAMACAO.map((d, i) => (
+          <button
+            key={d.dia}
+            onClick={() => setDiaAtivo(i)}
+            className={`flex-1 rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${
+              diaAtivo === i
+                ? "bg-pet-blue text-white"
+                : "bg-white text-pet-blueDark border border-slate-200 hover:border-pet-blue"
+            }`}
+          >
+            {d.dia}
+            <span className="block text-[11px] font-normal opacity-80">{d.data}</span>
+          </button>
+        ))}
+      </div>
+
+      <div className="space-y-6">
+        {PROGRAMACAO[diaAtivo].turnos.map((t) => (
+          <div key={t.turno}>
+            <div className="flex items-baseline gap-2 mb-2">
+              <h3 className="text-sm font-semibold text-pet-blueDark">{t.turno}</h3>
+              <span className="text-xs text-slate-400">{t.horario}</span>
+            </div>
+            <ul className="space-y-2">
+              {t.itens.map((item, i) => (
+                <ScheduleItem key={i} item={item} />
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================================
+   ABA: PALESTRANTES  (<Speakers/>)
+   Componente único que reúne todos os palestrantes do evento, sem vínculo
+   direto com uma palestra específica.
+   ============================================================================ */
+
+function Speakers() {
+  return (
+    <div className="max-w-5xl mx-auto">
+      <SectionTitle eyebrow="Palestrantes" title="Quem vai estar no evento">
+        Docentes da UEPA e convidados externos das áreas de saúde e tecnologia.
+      </SectionTitle>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {PALESTRANTES.map((p) => (
+          <div key={p.id} className="bg-white rounded-xl border border-slate-200 p-4 flex gap-3">
+            <div className="flex-none w-12 h-12 rounded-full bg-pet-blue text-white grid place-items-center font-semibold text-sm">
+              {p.iniciais}
+            </div>
+            <div className="min-w-0">
+              <p className="font-semibold text-sm text-pet-blueDark leading-snug">{p.nome}</p>
+              <p className="text-xs text-pet-orange font-medium mt-0.5">{p.cargo}</p>
+              <p className="text-xs text-slate-500">{p.instituicao}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================================
+   ABA: SUBMISSÃO DE ARTIGOS  (<Submissions/>)
+   ============================================================================ */
+
+function Submissions() {
+  return (
+    <div className="max-w-2xl mx-auto">
+      <SectionTitle eyebrow="Submissão de artigos" title="Envie seu trabalho para o simpósio">
+        O evento não utiliza formulário próprio — as submissões são feitas diretamente por
+        e-mail ou WhatsApp com a comissão científica.
+      </SectionTitle>
+
+      <div className="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 space-y-4">
+        <p className="text-[15px] text-slate-700 leading-relaxed">
+          São aceitos resumos expandidos (3 a 5 páginas) relacionados a projetos de saúde
+          digital, tecnologia aplicada à saúde ou experiências do PET Saúde. Envie seu arquivo em
+          PDF junto com o nome de todos os autores e a instituição de origem.
+        </p>
+        <ul className="text-sm text-slate-600 space-y-1.5 list-disc list-inside">
+          <li>Prazo de envio: até 05 de outubro de 2026.</li>
+          <li>Formato: PDF, modelo padrão de resumo expandido.</li>
+          <li>Retorno da avaliação: até 09 de outubro de 2026.</li>
+        </ul>
+
+        <div className="flex flex-col sm:flex-row gap-3 pt-2">
+          <a
+            href={LINK_EMAIL_SUBMISSAO}
+            className="flex-1 text-center bg-pet-blue hover:bg-pet-blueDark text-white text-sm font-semibold rounded-lg px-4 py-3 transition-colors"
+          >
+            Enviar por e-mail
+          </a>
+          <a
+            href={LINK_WHATSAPP_SUBMISSAO}
+            target="_blank"
+            rel="noreferrer"
+            className="flex-1 text-center bg-pet-orange hover:brightness-95 text-white text-sm font-semibold rounded-lg px-4 py-3 transition-colors"
+          >
+            Falar no WhatsApp
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================================
+   ABA: LOCAL  (<Location/>)
+   ============================================================================ */
+
+function Location() {
+  return (
+    <div className="max-w-2xl mx-auto">
+      <SectionTitle eyebrow="Local" title="Onde o evento acontece">
+        Endereço fictício dentro do campus da UEPA, gerado para fins de protótipo.
+      </SectionTitle>
+
+      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+        <div className="h-40 bg-pet-ice grid place-items-center text-pet-blue text-sm font-medium">
+          [ mapa incorporado do campus ]
+        </div>
+        <div className="p-5 space-y-3 text-sm text-slate-700">
+          <p>
+            <strong className="text-pet-blueDark">Auditório Central da UEPA</strong><br />
+            Travessa Djalma Dutra, s/n — Bloco de Pós-Graduação, 2º andar<br />
+            Telégrafo, Belém – PA, CEP 66087-100
+          </p>
+          <p><strong className="text-pet-blueDark">Como chegar:</strong> estacionamento próprio no campus, entrada pelo portão principal da Travessa Djalma Dutra.</p>
+          <p><strong className="text-pet-blueDark">Acessibilidade:</strong> rampas de acesso e vagas reservadas próximas ao Auditório Central.</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================================
+   ABA: PATROCINADORES & PARCEIROS  (<Sponsors/>)
+   ============================================================================ */
+
+function Sponsors() {
+  return (
+    <div className="max-w-3xl mx-auto space-y-10">
+      <div>
+        <SectionTitle eyebrow="Patrocinadores" title="Quem apoia financeiramente o evento" />
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {PATROCINADORES.map((s) => (
+            <div key={s.nome} className={`rounded-xl ${s.cor} text-white p-5 text-sm font-semibold flex items-center justify-center text-center h-24`}>
+              {s.nome}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <SectionTitle eyebrow="Parceiros" title="Instituições parceiras" />
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {PARCEIROS.map((p) => (
+            <div key={p.nome} className="rounded-xl border border-slate-200 bg-white p-5 text-sm font-medium text-pet-blueDark flex items-center justify-center text-center h-24">
+              {p.nome}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================================
+   ABA: CONTATOS  (<Contact/>)
+   ============================================================================ */
+
+function Contact() {
+  return (
+    <div className="max-w-xl mx-auto">
+      <SectionTitle eyebrow="Contato" title="Fale com a organização" />
+      <div className="bg-white rounded-xl border border-slate-200 divide-y divide-slate-100">
+        <a href={`mailto:${EVENTO.email}`} className="flex items-center gap-3 p-4 hover:bg-pet-ice/60 transition-colors">
+          <span className="flex-none w-10 h-10 rounded-full bg-pet-ice text-pet-blue grid place-items-center">✉</span>
+          <span>
+            <span className="block text-xs text-slate-500">E-mail</span>
+            <span className="block text-sm font-medium text-pet-blueDark">{EVENTO.email}</span>
+          </span>
+        </a>
+        <a href={LINK_WHATSAPP_INSCRICAO} target="_blank" rel="noreferrer" className="flex items-center gap-3 p-4 hover:bg-pet-ice/60 transition-colors">
+          <span className="flex-none w-10 h-10 rounded-full bg-pet-ice text-pet-blue grid place-items-center">☎</span>
+          <span>
+            <span className="block text-xs text-slate-500">WhatsApp</span>
+            <span className="block text-sm font-medium text-pet-blueDark">{EVENTO.whatsappExibicao}</span>
+          </span>
+        </a>
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================================
+   CTA DE INSCRIÇÃO — evento pago (R$ 15,00), redireciona para WhatsApp.
+   Fica visível no cabeçalho em telas largas e como faixa fixa no rodapé em
+   telas pequenas, para nunca depender de scroll para ser encontrado.
+   ============================================================================ */
+
+function InscricaoCTA({ className = "" }) {
+  return (
+    <a
+      href={LINK_WHATSAPP_INSCRICAO}
+      target="_blank"
+      rel="noreferrer"
+      className={`inline-flex items-center gap-2 bg-pet-orange hover:brightness-95 text-white text-sm font-semibold rounded-lg px-4 py-2.5 transition-colors whitespace-nowrap ${className}`}
+    >
+      Inscreva-se · {EVENTO.valorInscricao}
+    </a>
+  );
+}
+
+/* ============================================================================
+   CABEÇALHO + MENU DE ABAS (fixo)
+   ============================================================================ */
+
+const ABAS = [
+  { id: "sobre", label: "Sobre" },
+  { id: "programacao", label: "Programação" },
+  { id: "palestrantes", label: "Palestrantes" },
+  { id: "submissao", label: "Submissão" },
+  { id: "local", label: "Local" },
+  { id: "patrocinadores", label: "Patrocinadores" },
+  { id: "contato", label: "Contato" },
+];
+
+function Header({ abaAtiva, setAbaAtiva }) {
+  return (
+    <header className="sticky top-0 z-20 bg-pet-blue text-white shadow-sm">
+      <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+        <div className="min-w-0">
+          <p className="text-[15px] sm:text-base font-bold leading-none tracking-tight truncate">
+            PET Saúde Digital
+          </p>
+          <p className="text-[11px] text-white/70 mt-1 truncate">{EVENTO.instituicao}</p>
+        </div>
+        <InscricaoCTA className="hidden sm:inline-flex" />
+      </div>
+
+      {/* Menu de abas — navegação principal da SPA. Trocar de aba apenas
+          atualiza o estado `abaAtiva`; nenhuma rolagem de página ocorre. */}
+      <nav className="border-t border-white/10 bg-pet-blueDark/40">
+        <div className="max-w-5xl mx-auto px-2 flex gap-1 overflow-x-auto tabs-scroll">
+          {ABAS.map((aba) => (
+            <button
+              key={aba.id}
+              onClick={() => setAbaAtiva(aba.id)}
+              className={`flex-none px-3.5 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+                abaAtiva === aba.id
+                  ? "border-pet-orange text-white"
+                  : "border-transparent text-white/70 hover:text-white"
+              }`}
+            >
+              {aba.label}
+            </button>
+          ))}
+        </div>
+      </nav>
+    </header>
+  );
+}
+
+/* ============================================================================
+   RODAPÉ — logo da instituição promotora (UEPA) + faixa de inscrição mobile
+   ============================================================================ */
+
+function Footer() {
+  return (
+    <footer className="bg-pet-blueDark text-white mt-10">
+      <div className="max-w-5xl mx-auto px-4 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-11 h-11 rounded-lg bg-white/10 grid place-items-center text-xs font-bold">
+            UEPA
+          </div>
+          <div className="text-xs text-white/70 leading-snug">
+            Realização<br />
+            <span className="text-white font-medium">Universidade do Estado do Pará</span>
+          </div>
+        </div>
+        <p className="text-xs text-white/50 text-center sm:text-right">
+          {EVENTO.nome} · {EVENTO.data} · {EVENTO.local}
+        </p>
+      </div>
+    </footer>
+  );
+}
+
+/* ============================================================================
+   APP — estado principal da SPA (aba ativa)
+   ============================================================================ */
+
+function App() {
+  const [abaAtiva, setAbaAtiva] = useState("sobre");
+
+  // Renderização condicional: só o componente da aba ativa é montado.
+  // É essa troca que substitui a rolagem longa por navegação instantânea.
+  const conteudoPorAba = {
+    sobre: <About />,
+    programacao: <Schedule />,
+    palestrantes: <Speakers />,
+    submissao: <Submissions />,
+    local: <Location />,
+    patrocinadores: <Sponsors />,
+    contato: <Contact />,
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col bg-pet-ice">
+      <Header abaAtiva={abaAtiva} setAbaAtiva={setAbaAtiva} />
+
+      <main className="flex-1 w-full px-4 py-6 sm:py-8">
+        {conteudoPorAba[abaAtiva]}
+      </main>
+
+      <Footer />
+
+      {/* CTA de inscrição fixa no mobile — a divulgação principal é via
+          WhatsApp, então o botão precisa estar sempre acessível sem rolar. */}
+      <div className="sm:hidden sticky bottom-0 z-20 bg-white border-t border-slate-200 p-3">
+        <InscricaoCTA className="w-full justify-center" />
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
