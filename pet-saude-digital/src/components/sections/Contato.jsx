@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
-import { evento, linkEmail, linkWhatsApp } from '../../data/evento'
+import { evento, linkEmail } from '../../data/evento'
 import { surgir } from '../../lib/motion'
+import { useInscricao } from '../../contexto/Inscricao'
 import TituloSecao from '../ui/TituloSecao'
 import BlocoAcao from '../ui/BlocoAcao'
 import Sanfona from '../ui/Sanfona'
@@ -8,9 +9,9 @@ import Sanfona from '../ui/Sanfona'
 const duvidas = [
   {
     pergunta: 'Como faço a inscrição e como pago a taxa?',
-    resumo: 'Pelo WhatsApp, com pagamento em Pix',
+    resumo: 'No site, com pagamento em Pix',
     resposta:
-      'A inscrição é feita pelo WhatsApp da organização. Após a confirmação dos seus dados, você recebe o código Pix para o pagamento da taxa de R$ 15,00 e, em seguida, o comprovante de inscrição.',
+      'Clique em Inscrever-se no cabeçalho (ou na barra inferior do celular). Depois de preencher os dados, você paga a taxa de R$ 15,00 por Pix e recebe o comprovante no e-mail cadastrado. Quem já se inscreveu entra em Minha inscrição.',
   },
   {
     pergunta: 'A taxa de R$ 15,00 cobre a semana toda?',
@@ -33,6 +34,7 @@ const duvidas = [
 ]
 
 export default function Contato() {
+  const { abrir } = useInscricao()
   const blocos = [
     ...duvidas.map((d, i) => ({
       id: `duvida-${i}`,
@@ -78,7 +80,7 @@ export default function Contato() {
   return (
     <div className="mx-auto max-w-3xl">
       <TituloSecao numero="07" etiqueta="Contato" titulo="Fale com a organização">
-        Para inscrição, o WhatsApp é o caminho mais rápido.
+        A inscrição é feita neste site. WhatsApp e e-mail ficam para dúvidas.
       </TituloSecao>
 
       <motion.div
@@ -89,12 +91,10 @@ export default function Contato() {
       >
         <BlocoAcao
           tom="orange"
-          href={linkWhatsApp(
-            'Olá! Gostaria de me inscrever no I Simpósio PET Saúde Digital da UEPA.',
-          )}
-          etiqueta="Inscrições e dúvidas"
-          titulo="WhatsApp"
-          descricao={evento.whatsappExibicao}
+          onClick={abrir}
+          etiqueta="Inscrições"
+          titulo="Inscrever-se"
+          descricao={`${evento.taxa} · Pix no site`}
         />
         <BlocoAcao
           tom="navy"

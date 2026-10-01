@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Paletas de cores — Evento UEPA / PET-Saúde</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Inter',system-ui,'Segoe UI',sans-serif;
+  background:#F4F5F8;color:#14163F;line-height:1.6;
+  -webkit-font-smoothing:antialiased;padding:48px 0 80px;
+}
+.wrap{width:min(1080px,92vw);margin-inline:auto}
+h1,h2,h3{font-family:'Barlow Condensed','Inter',sans-serif;line-height:1.05}
+code,.hex{font-family:'JetBrains Mono',ui-monospace,monospace}
+
+/* cabeçalho */
+.page-head{margin-bottom:48px;max-width:70ch}
+.page-head span{
+  display:inline-block;background:#14163F;color:#fff;font-size:11px;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;padding:5px 12px;border-radius:5px;
+}
+.page-head h1{font-size:clamp(2.2rem,5vw,3.4rem);text-transform:uppercase;margin:14px 0 12px}
+.page-head p{color:#5A5D7A}
+
+/* origem das cores */
+.source{
+  display:flex;flex-wrap:wrap;gap:28px;background:#fff;border:1px solid #E1E3EE;
+  border-radius:14px;padding:22px 26px;margin-bottom:56px;
+}
+.source-block{flex:1 1 240px}
+.source-block h4{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:#5A5D7A;margin-bottom:12px;font-weight:700}
+.chips{display:flex;gap:8px}
+.chip{width:38px;height:38px;border-radius:9px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
+
+/* bloco de paleta */
+.palette{background:#fff;border:1px solid #E1E3EE;border-radius:18px;overflow:hidden;margin-bottom:46px}
+.palette-head{padding:28px 30px 24px;border-bottom:1px solid #EDEEF5;display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between}
+.palette-head h2{font-size:2rem;text-transform:uppercase}
+.palette-head p{color:#5A5D7A;font-size:.95rem;max-width:52ch;margin-top:4px}
+.badge{font-size:11px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;padding:6px 13px;border-radius:6px;color:#fff}
+
+/* faixa de amostras grandes */
+.strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.sw{
+  min-height:186px;padding:18px;display:flex;flex-direction:column;justify-content:flex-end;
+  cursor:pointer;position:relative;transition:filter .18s;
+}
+.sw:hover{filter:brightness(1.06)}
+.sw .role{font-size:10.5px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;opacity:.78}
+.sw .name{font-family:'Barlow Condensed',sans-serif;font-size:1.3rem;font-weight:700;margin:2px 0 6px}
+.sw .hex{font-size:12.5px;letter-spacing:.04em;opacity:.9}
+.sw .copied{
+  position:absolute;top:12px;right:12px;font-size:10px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;background:rgba(255,255,255,.9);color:#14163F;
+  padding:3px 8px;border-radius:4px;opacity:0;transition:opacity .2s;
+}
+.sw.ok .copied{opacity:1}
+
+/* tabela de uso */
+.usage{padding:26px 30px 30px}
+.usage h3{font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:#5A5D7A;margin-bottom:14px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#8A8DA6;font-weight:700;padding:0 12px 10px 0;border-bottom:1px solid #EDEEF5}
+td{padding:11px 12px 11px 0;border-bottom:1px solid #F2F3F8;vertical-align:top;color:#3D4062}
+td.dot-cell{width:34px}
+.dot{width:16px;height:16px;border-radius:5px;display:inline-block;box-shadow:inset 0 0 0 1px rgba(0,0,0,.1)}
+td .hex{font-size:12.5px;color:#5A5D7A;white-space:nowrap}
+
+/* demonstração aplicada */
+.demo{padding:0 30px 30px}
+.demo-inner{border:1px solid #EDEEF5;border-radius:14px;overflow:hidden}
+.demo-bar{padding:14px 20px;display:flex;align-items:center;justify-content:space-between;color:#fff}
+.demo-bar b{font-family:'Barlow Condensed',sans-serif;font-size:1.05rem;letter-spacing:.03em}
+.demo-btn{font-size:12px;font-weight:700;padding:8px 16px;border-radius:8px;color:#fff}
+.demo-body{padding:26px 22px;display:flex;flex-wrap:wrap;gap:22px;align-items:center}
+.demo-body h4{font-family:'Barlow Condensed',sans-serif;font-size:1.7rem;text-transform:uppercase;flex:1 1 240px}
+.demo-tags{display:flex;gap:8px;flex-wrap:wrap}
+.demo-tag{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:5px 11px;border-radius:999px}
+
+/* contraste */
+.contrast{padding:0 30px 30px}
+.contrast h3{font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:#5A5D7A;margin-bottom:14px}
+.contrast-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.ct{padding:14px 16px;border-radius:10px;font-size:13px;font-weight:600}
+.ct small{display:block;font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;opacity:.75;margin-top:4px}
+
+.note{color:#5A5D7A;font-size:13.5px;max-width:74ch}
+.note b{color:#14163F}
+
+@media (max-width:640px){
+  .palette-head{padding:22px}
+  .usage,.demo,.contrast{padding-inline:22px}
+  table{font-size:13px}
+}
+</style>
+</head>
+<body>
+<p style="width:min(1080px,92vw);margin:0 auto 18px;font-size:13px"><a href="index.html" style="color:#173C5E;font-weight:600">← Índice do trabalho</a></p>
+<div class="wrap">
+
+  <div class="page-head">
+    <span>Identidade visual</span>
+    <h1>Duas opções de paleta</h1>
+    <p>Ambas as paletas usam somente cores extraídas das logos da UEPA e do PET-Saúde. O que muda entre elas é qual cor assume o papel principal e qual assume o papel de destaque. Clique em qualquer amostra para copiar o código HEX.</p>
+  </div>
+
+  <!-- ORIGEM DAS CORES -->
+  <div class="source">
+    <div class="source-block">
+      <h4>Cores da logo UEPA</h4>
+      <div class="chips">
+        <div class="chip" style="background:#2E3192" title="#2E3192"></div>
+        <div class="chip" style="background:#ED1C24" title="#ED1C24"></div>
+        <div class="chip" style="background:#FFFFFF" title="#FFFFFF"></div>
+      </div>
+    </div>
+    <div class="source-block">
+      <h4>Cores da logo PET-Saúde</h4>
+      <div class="chips">
+        <div class="chip" style="background:#173C5E" title="#173C5E"></div>
+        <div class="chip" style="background:#E8531C" title="#E8531C"></div>
+        <div class="chip" style="background:#5BA3D9" title="#5BA3D9"></div>
+        <div class="chip" style="background:#FFFFFF" title="#FFFFFF"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PALETA A ============ -->
+  <div class="palette">
+    <div class="palette-head">
+      <div>
+        <h2>Paleta A — Institucional UEPA</h2>
+        <p>Azul-royal da UEPA como cor de estrutura e vermelho institucional como cor de ação. O azul-claro do PET-Saúde entra como apoio. Leitura formal e universitária.</p>
+      </div>
+      <div class="badge" style="background:#2E3192">Opção A</div>
+    </div>
+
+    <div class="strip">
+      <div class="sw" style="background:#2E3192;color:#fff" data-hex="#2E3192">
+        <span class="copied">copiado</span>
+        <div class="role">Primária</div><div class="name">Azul UEPA</div><div class="hex">#2E3192</div>
+      </div>
+      <div class="sw" style="background:#1D1F63;color:#fff" data-hex="#1D1F63">
+        <span class="copied">copiado</span>
+        <div class="role">Primária escura</div><div class="name">Azul profundo</div><div class="hex">#1D1F63</div>
+      </div>
+      <div class="sw" style="background:#ED1C24;color:#fff" data-hex="#ED1C24">
+        <span class="copied">copiado</span>
+        <div class="role">Destaque</div><div class="name">Vermelho UEPA</div><div class="hex">#ED1C24</div>
+      </div>
+      <div class="sw" style="background:#5BA3D9;color:#0B2237" data-hex="#5BA3D9">
+        <span class="copied">copiado</span>
+        <div class="role">Apoio</div><div class="name">Azul-claro PET</div><div class="hex">#5BA3D9</div>
+      </div>
+      <div class="sw" style="background:#EAEBF6;color:#2E3192" data-hex="#EAEBF6">
+        <span class="copied">copiado</span>
+        <div class="role">Fundo suave</div><div class="name">Azul lavado</div><div class="hex">#EAEBF6</div>
+      </div>
+      <div class="sw" style="background:#FFFFFF;color:#14163F;box-shadow:inset 1px 0 0 #EDEEF5" data-hex="#FFFFFF">
+        <span class="copied">copiado</span>
+        <div class="role">Base</div><div class="name">Branco</div><div class="hex">#FFFFFF</div>
+      </div>
+    </div>
+
+    <div class="usage">
+      <h3>Onde usar cada cor</h3>
+      <table>
+        <tr><th></th><th>Cor</th><th>Aplicação</th></tr>
+        <tr><td class="dot-cell"><span class="dot" style="background:#2E3192"></span></td>
+            <td><b>Azul UEPA</b><br><span class="hex">#2E3192</span></td>
+            <td>Cabeçalho, faixa do topo do banner, títulos principais, fundo de seções de destaque.</td></tr>
+        <tr><td class="dot-cell"><span class="dot" style="background:#1D1F63"></span></td>
+            <td><b>Azul profundo</b><br><span class="hex">#1D1F63</span></td>
+            <td>Rodapé, textos sobre fundo claro, sombras e bordas escuras.</td></tr>
+        <tr><td class="dot-cell"><span class="dot" style="background:#ED1C24"></span></td>
+            <td><b>Vermelho UEPA</b><br><span class="hex">#ED1C24</span></td>
+            <td>Botões de inscrição, datas, tags, ícones de chamada. Usar com parcimônia — no máximo 10% da peça.</td></tr>
+        <tr><td class="dot-cell"><span class="dot" style="background:#5BA3D9"></span></td>
+            <td><b>Azul-claro PET</b><br><span class="hex">#5BA3D9</span></td>
+            <td>Palavras destacadas dentro de títulos, gradientes, detalhes gráficos e linhas.</td></tr>
+        <tr><td class="dot-cell"><span class="dot" style="background:#EAEBF6"></span></td>
+            <td><b>Azul lavado</b><br><span class="hex">#EAEBF6</span></td>
+            <td>Fundo de seções alternadas, caixas de conteúdo, estados de hover.</td></tr>
+        <tr><td class="dot-cell"><span class="dot" style="background:#FFFFFF;box-shadow:inset 0 0 0 1px #DDD"></span></td>
+            <td><b>Branco</b><br><span class="hex">#FFFFFF</span></td>
+            <td>Fundo geral, respiro entre elementos, área de proteção das logos.</td></tr>
+      </table>
+    </div>
+
+    <div class="demo">
+      <div class="demo-inner">
+        <div class="demo-bar" style="background:#2E3192">
+          <b>SIMPÓSIO ISD 2026</b>
+          <span class="demo-btn" style="background:#ED1C24">Inscreva-se</span>
+        </div>
+        <div class="demo-body" style="background:#EAEBF6">
+          <h4 style="color:#1D1F63">Informação e <span style="color:#ED1C24">Saúde Digital</span></h4>
+          <div class="demo-tags">
+            <span class="demo-tag" style="background:#2E3192;color:#fff">Conferência</span>
+            <span class="demo-tag" style="background:#ED1C24;color:#fff">Inscrição gratuita</span>
+            <span class="demo-tag" style="background:#5BA3D9;color:#0B2237">Oficinas</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="contrast">
+      <h3>Contraste de texto</h3>
+      <div class="contrast-grid">
+        <div class="ct" style="background:#2E3192;color:#fff">Texto branco sobre azul<small>Contraste 10,4:1 · AAA</small></div>
+        <div class="ct" style="background:#ED1C24;color:#fff">Texto branco sobre vermelho<small>Contraste 4,6:1 · AA</small></div>
+        <div class="ct" style="background:#5BA3D9;color:#0B2237">Texto escuro sobre azul-claro<small>Contraste 7,9:1 · AAA</small></div>
+        <div class="ct" style="background:#FFFFFF;color:#1D1F63;box-shadow:inset 0 0 0 1px #E1E3EE">Texto azul sobre branco<small>Contraste 13,8:1 · AAA</small></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PALETA B ============ -->
+  <div class="palette">
+    <div class="palette-head">
+      <div>
+        <h2>Paleta B — PET-Saúde Digital</h2>
+        <p>Azul-marinho do PET-Saúde como base e laranja como cor de ação, com o azul-claro ganhando mais espaço. Leitura mais moderna e tecnológica, menos formal.</p>
+      </div>
+      <div class="badge" style="background:#E8531C">Opção B</div>
+    </div>
+
+    <div class="strip">
+      <div class="sw" style="background:#173C5E;color:#fff" data-hex="#173C5E">
+        <span class="copied">copiado</span>
+        <div class="role">Primária</div><div class="name">Marinho PET</div><div class="hex">#173C5E</div>
+      </div>
+      <div class="sw" style="background:#0E2740;color:#fff" data-hex="#0E2740">
+        <span class="copied">copiado</span>
+        <div class="role">Primária escura</div><div class="name">Marinho profundo</div><div class="hex">#0E2740</div>
+      </div>
+      <div class="sw" style="background:#E8531C;color:#fff" data-hex="#E8531C">
+        <span class="copied">copiado</span>
+        <div class="role">Destaque</div><div class="name">Laranja PET</div><div class="hex">#E8531C</div>
+      </div>
+      <div class="sw" style="background:#5BA3D9;color:#0B2237" data-hex="#5BA3D9">
+        <span class="copied">copiado</span>
+        <div class="role">Apoio</div><div class="name">Azul-claro PET</div><div class="hex">#5BA3D9</div>
+      </div>
+      <div class="sw" style="background:#E7F1F9;color:#173C5E" data-hex="#E7F1F9">
+        <span class="copied">copiado</span>
+        <div class="role">Fundo suave</div><div class="name">Azul gelo</div><div class="hex">#E7F1F9</div>
+      </div>
+      <div class="sw" style="background:#FFFFFF;color:#0E2740;box-shadow:inset 1px 0 0 #EDEEF5" data-hex="#FFFFFF">
+        <span class="copied">copiado</span>
+        <div class="role">Base</div><div class="name">Branco</div><div class="hex">#FFFFFF</div>
+      </div>
+    </div>
+
+    <div class="usage">
+      <h3>Onde usar cada cor</h3>
+      <table>
+        <tr><th></th><th>Cor</th><th>Aplicação</th></tr>
+        <tr><td class="dot-cell"><span class="dot" style="background:#173C5E"></span></td>
+            <td><b>Marinho PET</b><br><span class="hex">#173C5E</span></td>
+            <td>Cabeçalho, fundo do banner principal, títulos e blocos de destaque.</td></tr>
+        <tr><td class="dot-cell"><span class="dot" style="background:#0E2740"></span></td>
+            <td><b>Marinho profundo</b><br><span class="hex">#0E2740</span></td>
+            <td>Rodapé, corpo de texto sobre fundo claro, contraste máximo.</td></tr>
+        <tr><td class="dot-cell"><span class="dot" style="background:#E8531C"></span></td>
+            <td><b>Laranja PET</b><br><span class="hex">#E8531C</span></td>
+            <td>Botões, datas, tags e qualquer elemento que precise puxar o olhar primeiro.</td></tr>
+        <tr><td class="dot-cell"><span class="dot" style="background:#5BA3D9"></span></td>
+            <td><b>Azul-claro PET</b><br><span class="hex">#5BA3D9</span></td>
+            <td>Gradientes, ícones, palavras destacadas em títulos, elementos gráficos de fundo.</td></tr>
+        <tr><td class="dot-cell"><span class="dot" style="background:#E7F1F9"></span></td>
+            <td><b>Azul gelo</b><br><span class="hex">#E7F1F9</span></td>
+            <td>Fundo de seções alternadas, cartões e caixas informativas.</td></tr>
+        <tr><td class="dot-cell"><span class="dot" style="background:#FFFFFF;box-shadow:inset 0 0 0 1px #DDD"></span></td>
+            <td><b>Branco</b><br><span class="hex">#FFFFFF</span></td>
+            <td>Fundo geral, respiro entre elementos, área de proteção das logos.</td></tr>
+      </table>
+    </div>
+
+    <div class="demo">
+      <div class="demo-inner">
+        <div class="demo-bar" style="background:#173C5E">
+          <b>SIMPÓSIO ISD 2026</b>
+          <span class="demo-btn" style="background:#E8531C">Inscreva-se</span>
+        </div>
+        <div class="demo-body" style="background:#E7F1F9">
+          <h4 style="color:#0E2740">Informação e <span style="color:#E8531C">Saúde Digital</span></h4>
+          <div class="demo-tags">
+            <span class="demo-tag" style="background:#173C5E;color:#fff">Conferência</span>
+            <span class="demo-tag" style="background:#E8531C;color:#fff">Inscrição gratuita</span>
+            <span class="demo-tag" style="background:#5BA3D9;color:#0B2237">Oficinas</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="contrast">
+      <h3>Contraste de texto</h3>
+      <div class="contrast-grid">
+        <div class="ct" style="background:#173C5E;color:#fff">Texto branco sobre marinho<small>Contraste 11,6:1 · AAA</small></div>
+        <div class="ct" style="background:#E8531C;color:#fff">Texto branco sobre laranja<small>Contraste 3,6:1 · AA grande</small></div>
+        <div class="ct" style="background:#5BA3D9;color:#0B2237">Texto escuro sobre azul-claro<small>Contraste 7,9:1 · AAA</small></div>
+        <div class="ct" style="background:#FFFFFF;color:#0E2740;box-shadow:inset 0 0 0 1px #E1E3EE">Texto marinho sobre branco<small>Contraste 14,7:1 · AAA</small></div>
+      </div>
+    </div>
+  </div>
+
+  <p class="note"><b>Observação sobre o laranja da Paleta B:</b> em texto pequeno sobre branco ele fica abaixo do mínimo de acessibilidade. Use-o como fundo de botão com texto branco em corpo maior, ou em títulos — evite parágrafos em laranja.</p>
+
+</div>
+
+<script>
+  document.querySelectorAll('.sw').forEach(function (el) {
+    el.addEventListener('click', function () {
+      var hex = el.dataset.hex;
+      if (navigator.clipboard) { navigator.clipboard.writeText(hex); }
+      el.classList.add('ok');
+      setTimeout(function () { el.classList.remove('ok'); }, 1100);
+    });
+  });
+</script>
+</body>
+</html>

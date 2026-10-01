@@ -1,14 +1,14 @@
 import { motion } from 'framer-motion'
-import { evento, linkWhatsApp } from '../../data/evento'
+import { evento } from '../../data/evento'
+import { useInscricao } from '../../contexto/Inscricao'
 
 /**
  * Barra fixa de inscricao — visivel apenas no celular.
- *
- * O site sera divulgado principalmente por WhatsApp, entao a acao de
- * inscricao precisa estar sempre ao alcance do polegar, sem depender de
- * rolagem nem de voltar ao topo.
+ * Abre o assistente no proprio site, em tela cheia.
  */
 export default function BarraInscricao() {
+  const { abrir } = useInscricao()
+
   return (
     <motion.div
       initial={{ y: 60 }}
@@ -21,10 +21,9 @@ export default function BarraInscricao() {
         <span className="text-[15px] font-bold tracking-display text-white">{evento.taxa}</span>
       </div>
 
-      <a
-        href={linkWhatsApp('Olá! Gostaria de me inscrever no I Simpósio PET Saúde Digital da UEPA.')}
-        target="_blank"
-        rel="noreferrer"
+      <button
+        type="button"
+        onClick={abrir}
         className="flex items-center gap-2 bg-pet-orange px-5 text-[14px] font-semibold tracking-tight text-white active:brightness-95"
       >
         Inscrever-se
@@ -38,7 +37,7 @@ export default function BarraInscricao() {
         >
           <path d="M4 12h15M13 6l6 6-6 6" strokeLinecap="square" />
         </svg>
-      </a>
+      </button>
     </motion.div>
   )
 }

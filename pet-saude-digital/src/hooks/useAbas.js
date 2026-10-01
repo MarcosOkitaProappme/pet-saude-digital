@@ -15,7 +15,9 @@ export function useAbas(abas, inicial) {
   const ids = abas.map((a) => a.id)
 
   const lerHash = () => {
-    const hash = window.location.hash.replace('#', '')
+    const fromQuery = new URLSearchParams(window.location.search).get('aba')
+    if (fromQuery && ids.includes(fromQuery)) return fromQuery
+    const hash = window.location.hash.replace('#', '').split('&')[0]
     return ids.includes(hash) ? hash : inicial
   }
 

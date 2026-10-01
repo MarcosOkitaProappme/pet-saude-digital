@@ -1,0 +1,8 @@
+node_modules
+server/node_modules
+server/outbox
+dist
+.git
+.vercel
+*.md
+.env

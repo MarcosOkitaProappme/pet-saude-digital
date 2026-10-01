@@ -1,0 +1,60 @@
+services:
+  mysql:
+    image: mysql:8.0
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-petsaude}
+      MYSQL_USER: ${MYSQL_USER:-petsaude}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-petsaude}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./server/sql:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/api.Dockerfile
+    environment:
+      PORT: 3001
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-petsaude}
+      MYSQL_USER: ${MYSQL_USER:-petsaude}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-petsaude}
+      ASAAS_API_KEY: ${ASAAS_API_KEY:-}
+      ASAAS_WEBHOOK_TOKEN: ${ASAAS_WEBHOOK_TOKEN:-dev-webhook}
+      ASAAS_BASE_URL: ${ASAAS_BASE_URL:-https://api-sandbox.asaas.com/v3}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      RESEND_FROM: ${RESEND_FROM:-PET Saúde Digital <onboarding@resend.dev>}
+      SESSION_SECRET: ${SESSION_SECRET:-troque-isto-no-trabalho}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@petsaude.local}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123}
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  front:
+    build:
+      context: .
+      dockerfile: docker/front.Dockerfile
+    depends_on:
+      - api
+
+  nginx:
+    image: nginx:1.27-alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - api
+      - front
+
+volumes:
+  mysql_data:

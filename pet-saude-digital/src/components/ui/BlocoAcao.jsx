@@ -7,7 +7,7 @@ import { motion } from 'framer-motion'
  * principalmente por WhatsApp no celular, a area de toque precisa ser grande
  * e o destino precisa estar escrito por extenso.
  */
-export default function BlocoAcao({ href, etiqueta, titulo, descricao, tom = 'orange' }) {
+export default function BlocoAcao({ href, onClick, etiqueta, titulo, descricao, tom = 'orange' }) {
   const tons = {
     orange: 'bg-pet-orange text-white',
     navy: 'bg-pet-navy text-white',
@@ -15,18 +15,16 @@ export default function BlocoAcao({ href, etiqueta, titulo, descricao, tom = 'or
     claro: 'bg-white text-pet-deep border border-pet-navy/15',
   }
 
-  const externo = href.startsWith('http')
+  const classe = `group relative flex flex-col justify-between overflow-hidden p-4 text-left sm:p-6 ${tons[tom]}`
+  const motionProps = {
+    whileHover: { y: -3 },
+    whileTap: { scale: 0.985 },
+    transition: { type: 'spring', stiffness: 320, damping: 24 },
+    className: classe,
+  }
 
-  return (
-    <motion.a
-      href={href}
-      target={externo ? '_blank' : undefined}
-      rel={externo ? 'noreferrer' : undefined}
-      whileHover={{ y: -3 }}
-      whileTap={{ scale: 0.985 }}
-      transition={{ type: 'spring', stiffness: 320, damping: 24 }}
-      className={`group relative flex flex-col justify-between overflow-hidden p-4 sm:p-6 ${tons[tom]}`}
-    >
+  const interno = (
+    <>
       <span className="label opacity-70">{etiqueta}</span>
 
       <span className="mt-3 flex items-end justify-between gap-4 sm:mt-6">
@@ -53,6 +51,26 @@ export default function BlocoAcao({ href, etiqueta, titulo, descricao, tom = 'or
           <path d="M4 12h15M13 6l6 6-6 6" strokeLinecap="square" />
         </svg>
       </span>
+    </>
+  )
+
+  if (onClick) {
+    return (
+      <motion.button type="button" onClick={onClick} {...motionProps}>
+        {interno}
+      </motion.button>
+    )
+  }
+
+  const externo = href?.startsWith('http')
+  return (
+    <motion.a
+      href={href}
+      target={externo ? '_blank' : undefined}
+      rel={externo ? 'noreferrer' : undefined}
+      {...motionProps}
+    >
+      {interno}
     </motion.a>
   )
 }

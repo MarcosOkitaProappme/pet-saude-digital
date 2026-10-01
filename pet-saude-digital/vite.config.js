@@ -5,10 +5,13 @@ export default defineConfig({
   plugins: [react()],
   // base relativo: permite publicar o site em subpasta (ex: uepa.br/petsaude)
   // sem quebrar os caminhos dos assets gerados pelo build.
-  base: './',
+  base: '/',
   server: {
     port: 5173,
     open: true,
+    proxy: {
+      '/api': 'http://127.0.0.1:3001',
+    },
   },
   preview: {
     port: 4173,

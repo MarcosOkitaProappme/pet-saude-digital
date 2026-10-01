@@ -1,9 +1,9 @@
+import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { evento, linkWhatsApp } from '../../data/evento'
+import { evento } from '../../data/evento'
 import { suave } from '../../lib/motion'
-
-const MENSAGEM_INSCRICAO =
-  'Olá! Gostaria de me inscrever no I Simpósio PET Saúde Digital da UEPA.'
+import { useInscricao } from '../../contexto/Inscricao'
+import { useSessao } from '../../contexto/Sessao'
 
 /** Marca do evento: quadrado laranja + tipografia, sem arquivo de logo. */
 function Marca() {
@@ -52,18 +52,36 @@ function FichaTopo() {
 }
 
 export default function Cabecalho() {
+  const { abrir } = useInscricao()
+  const { participante } = useSessao()
+
   return (
     <header className="relative z-20 bg-pet-navy">
       <div className="mx-auto flex max-w-[1180px] items-center justify-between gap-4 px-4 py-2.5 sm:px-6 sm:py-3.5">
         <Marca />
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 sm:gap-4">
           <FichaTopo />
 
-          <motion.a
-            href={linkWhatsApp(MENSAGEM_INSCRICAO)}
-            target="_blank"
-            rel="noreferrer"
+          {participante ? (
+            <Link
+              to="/minha-inscricao"
+              className="text-[12.5px] font-semibold text-white/80 hover:text-white"
+            >
+              Minha inscrição
+            </Link>
+          ) : (
+            <Link
+              to="/entrar"
+              className="text-[12.5px] font-semibold text-white/80 hover:text-white"
+            >
+              Entrar
+            </Link>
+          )}
+
+          <motion.button
+            type="button"
+            onClick={abrir}
             whileHover={{ y: -2 }}
             whileTap={{ scale: 0.97 }}
             className="hidden items-center gap-2.5 bg-pet-orange px-4 py-2.5 sm:inline-flex"
@@ -75,7 +93,7 @@ export default function Cabecalho() {
             <span className="text-[13px] font-semibold tracking-tight text-white">
               Inscrever-se · {evento.taxa}
             </span>
-          </motion.a>
+          </motion.button>
         </div>
       </div>
     </header>

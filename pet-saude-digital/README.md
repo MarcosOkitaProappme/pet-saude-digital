@@ -18,9 +18,21 @@ comprimidas: 4,6 MB no original viraram ~250 KB no total.
 ```bash
 npm install
 npm run dev      # ambiente de desenvolvimento em http://localhost:5173
+npm run api      # API Express + MySQL (porta 3001) — use com o Vite
 npm run build    # gera a versão de produção em dist/
 npm run preview  # serve o build gerado, para conferência antes de publicar
 ```
+
+### Docker (Nginx + front + API + MySQL)
+
+Uma porta só: **http://localhost**. O Nginx encaminha `/` ao site e `/api` à API.
+
+```bash
+cp .env.example .env   # opcional — as chaves Asaas/Resend podem ficar vazias no trabalho
+docker compose up --build
+```
+
+Admin: `http://localhost/admin` (padrão `admin@petsaude.local` / `admin123`). Sem `ASAAS_API_KEY`, o Pix é simulado e o comprovante vai para `server/outbox/`.
 
 > No Windows, o `npm run dev` mantém um handle aberto em `dist/`. Se o build
 > falhar com "o processo não pode acessar o arquivo", pare o dev server antes.

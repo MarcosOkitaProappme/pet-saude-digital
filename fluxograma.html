@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fluxograma de acessos — PET Saúde Digital</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'IBM Plex Sans',system-ui,sans-serif;
+  background:#F7FAFC;color:#0E2740;line-height:1.45;
+  -webkit-font-smoothing:antialiased;padding:40px 0 80px;
+}
+.wrap{width:min(1180px,94vw);margin-inline:auto}
+.back{font-size:13px;margin-bottom:18px}
+.back a{color:#173C5E;font-weight:600;text-decoration:none}
+.kicker{
+  display:inline-block;background:#173C5E;color:#fff;font-size:11px;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;padding:5px 12px;
+}
+.page-head{max-width:72ch;margin-bottom:36px}
+.page-head h1{font-size:clamp(1.8rem,4vw,2.6rem);font-weight:700;letter-spacing:-.03em;margin:12px 0 10px;line-height:1.1}
+.page-head p{color:#173C5E;opacity:.7;font-size:15px}
+.sec{
+  font-size:12px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:#5BA3D9;
+  margin:42px 0 16px;
+}
+.board{background:#fff;border:1px solid #D7E3EE;padding:28px 22px 26px;overflow-x:auto}
+
+/* nós */
+.node{
+  border:1.5px solid #173C5E;background:#fff;padding:10px 12px;min-width:132px;
+  text-align:center;
+}
+.node b{display:block;font-size:13.5px;font-weight:700;letter-spacing:-.02em}
+.node small{display:block;margin-top:3px;font-size:11px;color:#173C5E;opacity:.55}
+.node.entry{background:#173C5E;color:#fff;border-color:#173C5E}
+.node.entry small{color:rgba(255,255,255,.65);opacity:1}
+.node.shell{background:#0E2740;color:#fff;border-color:#0E2740}
+.node.shell small{color:rgba(255,255,255,.6);opacity:1}
+.node.tab{background:#E7F1F9;border-color:#5BA3D9}
+.node.out{background:#FFF4EF;border-color:#E8531C;border-style:dashed}
+.node.cta{background:#E8531C;color:#fff;border-color:#E8531C}
+.node.cta small{color:rgba(255,255,255,.75);opacity:1}
+
+.arrow{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  font-size:10.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  color:#5BA3D9;padding:8px 0;
+}
+.arrow i{display:block;width:28px;height:2px;background:#5BA3D9;position:relative}
+.arrow i::after{
+  content:"";position:absolute;right:-1px;top:-3px;
+  border:4px solid transparent;border-left-color:#5BA3D9;border-right:0;
+}
+.arrow.down{flex-direction:column;padding:4px 0}
+.arrow.down i{width:2px;height:18px}
+.arrow.down i::after{
+  top:auto;bottom:-1px;left:-3px;right:auto;
+  border:4px solid transparent;border-top-color:#5BA3D9;border-left-color:transparent;border-bottom:0;
+}
+
+.row{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px}
+.trunk{width:2px;height:22px;background:#5BA3D9;margin:0 auto}
+.branch{
+  display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:14px 12px;
+  position:relative;padding-top:18px;
+}
+.branch::before{
+  content:"";position:absolute;top:0;left:8%;right:8%;height:2px;background:#5BA3D9;
+}
+.col{display:flex;flex-direction:column;align-items:center;position:relative}
+.col::before{
+  content:"";position:absolute;top:-18px;left:50%;width:2px;height:18px;background:#5BA3D9;
+}
+
+.legend{display:flex;flex-wrap:wrap;gap:16px;margin-top:22px;padding-top:16px;border-top:1px solid #E7F1F9;font-size:12px;color:#173C5E;opacity:.7}
+.legend span{display:flex;align-items:center;gap:8px}
+.legend i{width:18px;height:12px;border:1.5px solid #173C5E;flex:none}
+
+.flows{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}
+.flow{background:#fff;border:1px solid #D7E3EE;padding:22px}
+.flow h3{font-size:15px;font-weight:700;margin-bottom:16px}
+.steps{display:flex;flex-direction:column;align-items:stretch}
+.steps .node{text-align:left}
+
+@media (max-width:900px){
+  .branch{grid-template-columns:repeat(2,1fr)}
+  .branch::before,.col::before{display:none}
+}
+@media print{
+  body{padding:16px 0}
+  .back{display:none}
+  .board,.flow{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="back"><a href="index.html">← Índice do trabalho</a></p>
+
+  <div class="page-head">
+    <span class="kicker">Arquitetura de acesso</span>
+    <h1>Fluxograma de acessos do site</h1>
+    <p>Como o visitante entra, troca de seção e sai do site. O desenho descreve o que o código implementa hoje — SPA de 7 abas — e não o mapa antigo com páginas soltas.</p>
+  </div>
+
+  <p class="sec">01 · Mapa de navegação</p>
+  <div class="board">
+    <div class="row">
+      <div class="node entry"><b>Visitante</b><small>WhatsApp, Instagram ou busca</small></div>
+    </div>
+    <div class="arrow down">abre o site<i></i></div>
+    <div class="row">
+      <div class="node"><b>SPA · I Simpósio</b><small>um único endereço</small></div>
+    </div>
+    <div class="arrow down">monta a casca<i></i></div>
+    <div class="row">
+      <div class="node shell"><b>Casca fixa</b><small>ticker · cabeçalho · menu de abas</small></div>
+    </div>
+    <div class="trunk"></div>
+
+    <div class="branch">
+      <div class="col">
+        <div class="node tab"><b>01 Sobre</b><small>#sobre · aba inicial</small></div>
+      </div>
+      <div class="col">
+        <div class="node tab"><b>02 Programação</b><small>#programacao</small></div>
+        <div class="arrow down">clique na linha<i></i></div>
+        <div class="node out"><b>Detalhe da atividade</b><small>sala, palestrante, texto</small></div>
+      </div>
+      <div class="col">
+        <div class="node tab"><b>03 Palestrantes</b><small>#palestrantes</small></div>
+        <div class="arrow down">clique no card<i></i></div>
+        <div class="node out"><b>Painel do palestrante</b><small>minicurrículo e grade</small></div>
+      </div>
+      <div class="col">
+        <div class="node tab"><b>04 Submissão</b><small>#submissao</small></div>
+        <div class="arrow down">BlocoAcao<i></i></div>
+        <div class="node out"><b>E-mail ou WhatsApp</b><small>PDF do artigo · sem formulário</small></div>
+      </div>
+      <div class="col">
+        <div class="node tab"><b>05 Local</b><small>#local</small></div>
+        <div class="arrow down">como chegar<i></i></div>
+        <div class="node out"><b>Mapa externo</b><small>Campus XXII · Ananindeua</small></div>
+      </div>
+      <div class="col">
+        <div class="node tab"><b>06 Apoiadores</b><small>#apoiadores</small></div>
+        <div class="arrow down">três blocos<i></i></div>
+        <div class="node out"><b>Realização · Patrocínio · Parceiros</b></div>
+      </div>
+      <div class="col">
+        <div class="node tab"><b>07 Contato</b><small>#contato</small></div>
+        <div class="arrow down">redes<i></i></div>
+        <div class="node out"><b>Instagram do PET</b></div>
+      </div>
+      <div class="col">
+        <div class="node cta"><b>Inscrever-se</b><small>CTA permanente · R$ 15</small></div>
+        <div class="arrow down">sempre visível<i></i></div>
+        <div class="node out"><b>WhatsApp wa.me</b><small>cabeçalho e barra no celular</small></div>
+      </div>
+    </div>
+
+    <div class="legend">
+      <span><i style="background:#173C5E"></i> entrada</span>
+      <span><i style="background:#0E2740"></i> casca fixa</span>
+      <span><i style="background:#E7F1F9;border-color:#5BA3D9"></i> aba (hash na URL)</span>
+      <span><i style="background:#FFF4EF;border-color:#E8531C;border-style:dashed"></i> destino fora do site ou painel</span>
+      <span><i style="background:#E8531C;border-color:#E8531C"></i> conversão</span>
+    </div>
+  </div>
+
+  <p class="sec">02 · Dois caminhos que convertem</p>
+  <div class="flows">
+    <div class="flow">
+      <h3>Inscrição no simpósio</h3>
+      <div class="steps">
+        <div class="node entry"><b>Qualquer aba</b><small>o menu não some</small></div>
+        <div class="arrow down">CTA laranja<i></i></div>
+        <div class="node cta"><b>Inscrever-se · R$ 15,00</b><small>desktop no topo · celular embaixo</small></div>
+        <div class="arrow down">abre o app<i></i></div>
+        <div class="node out"><b>WhatsApp com texto pronto</b><small>não existe /inscricao nem formulário</small></div>
+      </div>
+    </div>
+    <div class="flow">
+      <h3>Envio de artigo</h3>
+      <div class="steps">
+        <div class="node tab"><b>Aba 04 · Submissão</b><small>#submissao · link próprio para o WhatsApp</small></div>
+        <div class="arrow down">escolhe o canal<i></i></div>
+        <div class="node"><b>mailto: ou wa.me</b><small>resumo expandido em PDF</small></div>
+        <div class="arrow down">fora do site<i></i></div>
+        <div class="node out"><b>Caixa de e-mail ou conversa</b><small>sem upload interno</small></div>
+      </div>
+    </div>
+  </div>
+
+  <p class="sec">Como usar na apresentação</p>
+  <p style="max-width:70ch;color:#173C5E;opacity:.7;font-size:14.5px">
+    O primeiro quadro cabe em um slide (imprimir ou capturar a tela). Os dois fluxos menores explicam por que o cadastro e a submissão não são páginas: o cliente pediu WhatsApp. O FigJam anterior tinha o mesmo desenho, mas os acentos quebraram e as abas trocaram de número — use este HTML.
+  </p>
+</div>
+</body>
+</html>
