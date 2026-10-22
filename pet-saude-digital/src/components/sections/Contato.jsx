@@ -5,36 +5,36 @@ import { useInscricao } from '../../contexto/Inscricao'
 import TituloSecao from '../ui/TituloSecao'
 import BlocoAcao from '../ui/BlocoAcao'
 import Sanfona from '../ui/Sanfona'
-
-const duvidas = [
-  {
-    pergunta: 'Como faço a inscrição e como pago a taxa?',
-    resumo: 'No site, com pagamento em Pix',
-    resposta:
-      'Clique em Inscrever-se no cabeçalho (ou na barra inferior do celular). Depois de preencher os dados, você paga a taxa de R$ 15,00 por Pix e recebe o comprovante no e-mail cadastrado. Quem já se inscreveu entra em Minha inscrição.',
-  },
-  {
-    pergunta: 'A taxa de R$ 15,00 cobre a semana toda?',
-    resumo: 'Sim, valor único para os cinco dias',
-    resposta:
-      'Sim. O valor é único e dá acesso a toda a programação dos cinco dias, incluindo palestras, minicursos, oficinas e mesas-redondas, além do certificado de 40 horas e do coffee break.',
-  },
-  {
-    pergunta: 'Os minicursos têm vagas limitadas?',
-    resumo: '30 vagas por minicurso',
-    resposta:
-      'Sim. Cada minicurso comporta 30 participantes, porque o campus tem um único laboratório de informática — por isso eles acontecem em dias diferentes, e não em paralelo. A escolha é feita na inscrição, por ordem de confirmação de pagamento.',
-  },
-  {
-    pergunta: 'Preciso ser estudante da UEPA?',
-    resumo: 'Não, o evento é aberto ao público externo',
-    resposta:
-      'Não. O simpósio é aberto à comunidade externa, especialmente a profissionais e estudantes das áreas de saúde e tecnologia da região metropolitana de Belém.',
-  },
-]
+import { useTaxa } from '../../hooks/useTaxa'
 
 export default function Contato() {
   const { abrir } = useInscricao()
+  const taxa = useTaxa()
+  const duvidas = [
+    {
+      pergunta: 'Como faço a inscrição e como pago a taxa?',
+      resumo: 'No site, com pagamento em Pix',
+      resposta: `Clique em Inscrever-se no cabeçalho (ou na barra inferior do celular). Depois de preencher os dados, você paga a taxa de ${taxa} por Pix e recebe o comprovante no e-mail cadastrado. Quem já se inscreveu entra em Minha inscrição.`,
+    },
+    {
+      pergunta: `A taxa de ${taxa} cobre a semana toda?`,
+      resumo: 'Sim, valor único para os cinco dias',
+      resposta:
+        'Sim. O valor é único e dá acesso a toda a programação dos cinco dias, incluindo palestras, minicursos, oficinas e mesas-redondas, além do certificado de 40 horas e do coffee break.',
+    },
+    {
+      pergunta: 'Os minicursos têm vagas limitadas?',
+      resumo: '30 vagas por minicurso',
+      resposta:
+        'Sim. Cada minicurso comporta 30 participantes, porque o campus tem um único laboratório de informática — por isso eles acontecem em dias diferentes, e não em paralelo. A escolha é feita na inscrição, por ordem de confirmação de pagamento.',
+    },
+    {
+      pergunta: 'Preciso ser estudante da UEPA?',
+      resumo: 'Não, o evento é aberto ao público externo',
+      resposta:
+        'Não. O simpósio é aberto à comunidade externa, especialmente a profissionais e estudantes das áreas de saúde e tecnologia da região metropolitana de Belém.',
+    },
+  ]
   const blocos = [
     ...duvidas.map((d, i) => ({
       id: `duvida-${i}`,
@@ -94,7 +94,7 @@ export default function Contato() {
           onClick={abrir}
           etiqueta="Inscrições"
           titulo="Inscrever-se"
-          descricao={`${evento.taxa} · Pix no site`}
+          descricao={`${taxa} · Pix no site`}
         />
         <BlocoAcao
           tom="navy"

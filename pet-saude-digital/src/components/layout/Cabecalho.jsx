@@ -4,6 +4,7 @@ import { evento } from '../../data/evento'
 import { suave } from '../../lib/motion'
 import { useInscricao } from '../../contexto/Inscricao'
 import { useSessao } from '../../contexto/Sessao'
+import { useTaxa } from '../../hooks/useTaxa'
 
 /** Marca do evento: quadrado laranja + tipografia, sem arquivo de logo. */
 function Marca() {
@@ -54,6 +55,7 @@ function FichaTopo() {
 export default function Cabecalho() {
   const { abrir } = useInscricao()
   const { participante } = useSessao()
+  const taxa = useTaxa()
 
   return (
     <header className="relative z-20 bg-pet-navy">
@@ -91,7 +93,7 @@ export default function Cabecalho() {
               <span className="relative inline-flex h-2 w-2 bg-white" />
             </span>
             <span className="text-[13px] font-semibold tracking-tight text-white">
-              Inscrever-se · {evento.taxa}
+              Inscrever-se · {taxa}
             </span>
           </motion.button>
         </div>

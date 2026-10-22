@@ -5,17 +5,19 @@ import { surgir } from '../../lib/motion'
 import TituloSecao from '../ui/TituloSecao'
 import Sanfona from '../ui/Sanfona'
 import Monograma from '../ui/Monograma'
+import { useTaxa } from '../../hooks/useTaxa'
 
 /**
  * Faixa de dados essenciais — o unico bloco sempre visivel alem do titulo.
  * Sao as quatro informacoes que alguem precisa antes de decidir participar.
  */
 function FaixaEssencial() {
+  const taxa = useTaxa()
   const dados = [
     ['Data', evento.dataCurta, 'segunda a sexta'],
     ['Horário', '08h — 17h', 'presencial'],
     ['Local', 'Campus XXII', 'Ananindeua — PA'],
-    ['Inscrição', evento.taxa, 'certificado 40h'],
+    ['Inscrição', taxa, 'certificado 40h'],
   ]
 
   return (

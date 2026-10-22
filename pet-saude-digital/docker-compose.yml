@@ -31,7 +31,7 @@ services:
       ASAAS_WEBHOOK_TOKEN: ${ASAAS_WEBHOOK_TOKEN:-dev-webhook}
       ASAAS_BASE_URL: ${ASAAS_BASE_URL:-https://api-sandbox.asaas.com/v3}
       RESEND_API_KEY: ${RESEND_API_KEY:-}
-      RESEND_FROM: ${RESEND_FROM:-PET Saúde Digital <onboarding@resend.dev>}
+      RESEND_FROM: "${RESEND_FROM:-PET Saúde Digital <noreply@arenahub.app.br>}"
       SESSION_SECRET: ${SESSION_SECRET:-troque-isto-no-trabalho}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@petsaude.local}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123}

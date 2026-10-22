@@ -170,23 +170,35 @@ export default function MinhaInscricao() {
               <input className={`${classeInput} bg-pet-ice`} value={mascaraCpf(form.cpf)} disabled />
             </Campo>
             <p className="mb-2 text-[12px] font-semibold text-pet-navy">Atividades</p>
-            {(config?.atividades || []).map((a) => (
-              <label key={a.id} className="mb-1 flex gap-2 text-[13px] text-pet-navy">
-                <input
-                  type="checkbox"
-                  checked={form.atividades.includes(a.id)}
-                  onChange={(e) =>
-                    setForm({
-                      ...form,
-                      atividades: e.target.checked
-                        ? [...form.atividades, a.id]
-                        : form.atividades.filter((id) => id !== a.id),
-                    })
-                  }
-                />
-                {a.titulo}
-              </label>
-            ))}
+            {participante.status === 'pago' ? (
+              <p className="mb-3 text-[13px] text-pet-navy/70">
+                Inscrição paga. Dá para corrigir nome, telefone e gênero. Atividades e valor ficam como estavam.
+              </p>
+            ) : (
+              (config?.atividades || []).map((a) => {
+                const jaTem = form.atividades.includes(a.id)
+                const bloqueada = a.esgotada && !jaTem
+                return (
+                  <label key={a.id} className={`mb-1 flex gap-2 text-[13px] ${bloqueada ? 'text-pet-navy/40' : 'text-pet-navy'}`}>
+                    <input
+                      type="checkbox"
+                      disabled={bloqueada}
+                      checked={jaTem}
+                      onChange={(e) =>
+                        setForm({
+                          ...form,
+                          atividades: e.target.checked
+                            ? [...form.atividades, a.id]
+                            : form.atividades.filter((id) => id !== a.id),
+                        })
+                      }
+                    />
+                    {a.titulo}
+                    {bloqueada && <span className="uppercase">esgotada</span>}
+                  </label>
+                )
+              })
+            )}
             <button className="mt-4 w-full bg-pet-orange py-2.5 text-[13px] font-semibold text-white">Salvar alterações</button>
             <button type="button" onClick={() => setEditando(false)} className="mt-2 w-full py-2 text-[13px] text-pet-navy/60">
               Voltar
@@ -200,12 +212,17 @@ export default function MinhaInscricao() {
           <div className="w-full max-w-sm bg-white p-5">
             <p className="font-semibold text-pet-deep">Cancelar inscrição?</p>
             <p className="mt-2 text-[13px] text-pet-navy/70">
-              Sua vaga será liberada. A taxa de R$ {Number(participante.valor).toFixed(2).replace('.', ',')}{' '}
-              {reembolso > 0 ? `tem reembolso de ${reembolso}%.` : 'não é devolvida.'}
+              {participante.podeCancelar === false
+                ? 'O prazo de cancelamento configurado pela organização já passou. Fale com a organização.'
+                : participante.status === 'pago'
+                  ? `A vaga será liberada. O percentual de reembolso configurado é ${reembolso}%, mas a devolução do Pix não é automática.`
+                  : 'A vaga será liberada e a cobrança Pix em aberto será cancelada.'}
             </p>
-            <button type="button" onClick={cancelar} className="mt-4 w-full bg-pet-orange py-2.5 text-[13px] font-semibold text-white">
-              Sim, cancelar
-            </button>
+            {participante.podeCancelar !== false && (
+              <button type="button" onClick={cancelar} className="mt-4 w-full bg-pet-orange py-2.5 text-[13px] font-semibold text-white">
+                Sim, cancelar
+              </button>
+            )}
             <button type="button" onClick={() => setConfirmar(false)} className="mt-2 w-full border border-pet-navy/20 py-2 text-[13px] font-semibold text-pet-navy">
               Manter inscrição
             </button>

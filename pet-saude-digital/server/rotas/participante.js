@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs'
 import {
   atividadesComVagas,
   config,
+  dentroDoPrazo,
   montarInscricao,
   nomeExibicao,
   q,
@@ -18,14 +19,20 @@ function exigeLogin(req, _res, next) {
   next()
 }
 
-async function calcularValor(ids) {
+async function calcularValor(ids, inscricaoId = null) {
+  const unicos = [...new Set(ids.map(String))]
   const cfg = await config()
   const lista = await atividadesComVagas()
+  const proprias = new Set()
+  if (inscricaoId) {
+    const rows = await q('SELECT atividade_id FROM inscricao_atividades WHERE inscricao_id = ?', [inscricaoId])
+    for (const r of rows) proprias.add(r.atividade_id)
+  }
   let extra = 0
-  for (const id of ids) {
+  for (const id of unicos) {
     const a = lista.find((x) => x.id === id)
     if (!a) throw erro(400, 'Atividade inválida.')
-    if (a.esgotada) throw erro(409, `Sem vagas: ${a.titulo}`)
+    if (a.esgotada && !proprias.has(id)) throw erro(409, `Sem vagas: ${a.titulo}`)
     extra += a.precoExtra
   }
   return Number(cfg.taxa_base) + extra
@@ -137,7 +144,13 @@ participante.patch('/eu', exigeLogin, async (req, res, next) => {
       throw erro(400, 'E-mail e CPF não podem ser alterados. Fale com a organização.')
     }
 
-    const valor = await calcularValor(dados.atividades)
+    const pago = atual.status === 'pago'
+    const atividadesNovas = pago ? atual.atividades.map((a) => a.id) : dados.atividades
+    const antes = atual.atividades.map((a) => a.id).sort().join('|')
+    const depois = [...atividadesNovas].sort().join('|')
+    const mudouAtividades = !pago && antes !== depois
+    const valor = mudouAtividades ? await calcularValor(atividadesNovas, atual.id) : atual.valor
+
     await q(
       `UPDATE participantes SET nome_completo=?, usa_nome_social=?, nome_social=?, genero=?, nascimento=?, telefone=?
        WHERE id=?`,
@@ -151,8 +164,14 @@ participante.patch('/eu', exigeLogin, async (req, res, next) => {
         req.session.participanteId,
       ],
     )
-    await q('UPDATE inscricoes SET valor=? WHERE id=?', [valor, atual.id])
-    await vincularAtividades(atual.id, dados.atividades)
+    if (mudouAtividades) {
+      await q('UPDATE inscricoes SET valor=? WHERE id=?', [valor, atual.id])
+      await vincularAtividades(atual.id, atividadesNovas)
+      if (atual.status === 'aguardando_pix' && Number(valor) !== Number(atual.valor)) {
+        res.json(await gerarPixPara(req.session.participanteId))
+        return
+      }
+    }
     res.json(await montarInscricao(req.session.participanteId))
   } catch (err) {
     next(err)
@@ -232,6 +251,10 @@ participante.post('/cancelar', exigeLogin, async (req, res, next) => {
     const insc = await montarInscricao(req.session.participanteId)
     if (!insc) throw erro(404, 'Inscrição não encontrada.')
     if (insc.status === 'cancelada') return res.json(insc)
+    if (!insc.podeCancelar) {
+      const cfg = await config()
+      throw erro(403, `O prazo de ${cfg.prazo_cancelamento_dias} dias para cancelar já passou. Fale com a organização.`)
+    }
     const [row] = await q('SELECT asaas_payment_id FROM inscricoes WHERE id=?', [insc.id])
     if (row?.asaas_payment_id) await cancelarCobranca(row.asaas_payment_id)
     await q(

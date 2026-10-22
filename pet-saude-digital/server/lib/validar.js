@@ -55,7 +55,7 @@ export function validarCadastro(corpo, { senhaObrigatoria = true } = {}) {
   const senha = String(corpo.senha || '')
   const senha2 = String(corpo.senha2 || '')
   const aceiteLgpd = Boolean(corpo.aceiteLgpd)
-  const atividades = Array.isArray(corpo.atividades) ? corpo.atividades.map(String) : []
+  const atividades = [...new Set(Array.isArray(corpo.atividades) ? corpo.atividades.map(String) : [])]
 
   if (!nomeCompletoValido(nomeCompleto)) throw erro(400, 'Informe o nome completo (pelo menos duas palavras).')
   if (usaNomeSocial && nomeSocial.length < 2) throw erro(400, 'Informe o nome social.')

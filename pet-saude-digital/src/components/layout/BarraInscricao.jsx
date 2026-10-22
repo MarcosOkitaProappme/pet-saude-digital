@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
-import { evento } from '../../data/evento'
 import { useInscricao } from '../../contexto/Inscricao'
+import { useTaxa } from '../../hooks/useTaxa'
 
 /**
  * Barra fixa de inscricao — visivel apenas no celular.
@@ -8,6 +8,7 @@ import { useInscricao } from '../../contexto/Inscricao'
  */
 export default function BarraInscricao() {
   const { abrir } = useInscricao()
+  const taxa = useTaxa()
 
   return (
     <motion.div
@@ -18,7 +19,7 @@ export default function BarraInscricao() {
     >
       <div className="flex flex-1 flex-col justify-center px-4 py-2.5 leading-tight">
         <span className="label text-white/40">Inscrição</span>
-        <span className="text-[15px] font-bold tracking-display text-white">{evento.taxa}</span>
+        <span className="text-[15px] font-bold tracking-display text-white">{taxa}</span>
       </div>
 
       <button

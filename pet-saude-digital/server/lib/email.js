@@ -5,9 +5,16 @@ import { fileURLToPath } from 'node:url'
 const RAIZ = dirname(fileURLToPath(import.meta.url))
 const OUTBOX = join(RAIZ, '..', 'outbox')
 
+function escapar(valor) {
+  return String(valor ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+}
+
 function htmlComprovante({ nome, numero, valor, status, atividades, email }) {
   const lista = atividades.length
-    ? atividades.map((a) => `<li>${a}</li>`).join('')
+    ? atividades.map((a) => `<li>${escapar(a)}</li>`).join('')
     : '<li>Nenhuma atividade extra selecionada</li>'
   const pagamento = status === 'pago'
     ? `Pix · R$ ${Number(valor).toFixed(2).replace('.', ',')} · confirmado`
@@ -20,9 +27,9 @@ function htmlComprovante({ nome, numero, valor, status, atividades, email }) {
     <div style="background:#173C5E;color:#fff;padding:18px 22px;font-weight:700">PET Saúde Digital · UEPA</div>
     <div style="padding:22px">
       <h1 style="font-size:20px;margin:0 0 8px">Inscrição confirmada</h1>
-      <p style="margin:0 0 16px;color:#173C5E">Olá, ${nome}. Enviamos este comprovante para ${email}.</p>
-      <p><b>Inscrição nº</b> ${numero}<br>
-         <b>Nome</b> ${nome}<br>
+      <p style="margin:0 0 16px;color:#173C5E">Olá, ${escapar(nome)}. Enviamos este comprovante para ${escapar(email)}.</p>
+      <p><b>Inscrição nº</b> ${escapar(numero)}<br>
+         <b>Nome</b> ${escapar(nome)}<br>
          <b>Pagamento</b> ${pagamento}<br>
          <b>Palestras</b> ${atividades.length} selecionadas</p>
       <ul>${lista}</ul>
@@ -42,7 +49,7 @@ export async function enviarComprovante(dados) {
   const html = htmlComprovante(dados)
   const assunto = 'Inscrição confirmada — I Simpósio PET Saúde Digital'
   const chave = process.env.RESEND_API_KEY || ''
-  const de = process.env.RESEND_FROM || 'PET Saúde Digital <onboarding@resend.dev>'
+  const de = process.env.RESEND_FROM || 'PET Saúde Digital <noreply@arenahub.app.br>'
 
   await mkdir(OUTBOX, { recursive: true })
   const arquivo = join(OUTBOX, `${dados.numero}-${Date.now()}.html`)

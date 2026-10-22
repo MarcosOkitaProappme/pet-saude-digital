@@ -11,6 +11,22 @@ const ABAS = [
   { id: 'config', rotulo: 'Config' },
 ]
 
+const DIAS = [
+  { id: 'segunda', rotulo: 'Segunda-feira', data: '19/10' },
+  { id: 'terca', rotulo: 'Terça-feira', data: '20/10' },
+  { id: 'quarta', rotulo: 'Quarta-feira', data: '21/10' },
+  { id: 'quinta', rotulo: 'Quinta-feira', data: '22/10' },
+  { id: 'sexta', rotulo: 'Sexta-feira', data: '23/10' },
+]
+
+const TIPOS = [
+  { id: 'palestra', rotulo: 'Palestra' },
+  { id: 'mesa', rotulo: 'Mesa' },
+  { id: 'minicurso', rotulo: 'Minicurso' },
+  { id: 'oficina', rotulo: 'Oficina' },
+  { id: 'projetos', rotulo: 'Projetos' },
+]
+
 export default function Admin() {
   const { admin, recarregar } = useSessao()
   const [email, setEmail] = useState('')
@@ -112,6 +128,7 @@ export default function Admin() {
       </nav>
 
       <main className="mx-auto max-w-6xl px-4 py-5">
+        {erro && <p className="mb-3 text-[13px] text-pet-orange">{erro}</p>}
         {aba === 'inscritos' && (
           <>
             {resumo && (
@@ -227,38 +244,75 @@ export default function Admin() {
         )}
 
         {aba === 'atividades' && cfg && (
-          <div className="space-y-2">
-            {cfg.atividades.map((a) => (
-              <form
-                key={a.id}
-                className="grid items-end gap-2 border border-pet-navy/10 bg-white p-3 sm:grid-cols-[1fr_90px_90px_80px]"
-                onSubmit={async (e) => {
-                  e.preventDefault()
-                  const fd = new FormData(e.target)
-                  await api(`/admin/atividades/${a.id}`, {
-                    method: 'PUT',
-                    body: { precoExtra: fd.get('preco'), vagas: fd.get('vagas') },
-                  })
-                  carregarCfg()
-                }}
-              >
-                <p className="text-[13px] text-pet-navy">
-                  {a.titulo}
-                  <span className="block text-[11px] text-pet-navy/45">
-                    {a.ocupadas} ocupadas{a.vagas != null ? ` / ${a.vagas}` : ''}
-                  </span>
-                </p>
-                <label className="text-[11px] text-pet-navy/50">
-                  Extra
-                  <input name="preco" defaultValue={a.precoExtra} className={classeInput} />
-                </label>
-                <label className="text-[11px] text-pet-navy/50">
-                  Vagas
-                  <input name="vagas" defaultValue={a.vagas ?? ''} className={classeInput} />
-                </label>
-                <button className="bg-pet-navy py-2 text-[12px] font-semibold text-white">Salvar</button>
-              </form>
-            ))}
+          <div className="space-y-6">
+            {DIAS.map((dia) => {
+              const doDia = cfg.atividades.filter((a) => a.diaId === dia.id)
+              return (
+                <section key={dia.id}>
+                  <h2 className="mb-2 text-[14px] font-semibold text-pet-deep">
+                    {dia.rotulo} <span className="font-normal text-pet-navy/45">{dia.data}</span>
+                  </h2>
+                  <div className="space-y-2">
+                    {doDia.length === 0 && (
+                      <p className="text-[13px] text-pet-navy/50">Nenhuma atividade neste dia.</p>
+                    )}
+                    {doDia.map((a) => (
+                      <form
+                        key={a.id}
+                        className="grid items-end gap-2 border border-pet-navy/10 bg-white p-3 sm:grid-cols-[1fr_90px_90px_80px_80px]"
+                        onSubmit={async (e) => {
+                          e.preventDefault()
+                          setErro('')
+                          const fd = new FormData(e.target)
+                          try {
+                            await api(`/admin/atividades/${a.id}`, {
+                              method: 'PUT',
+                              body: { precoExtra: fd.get('preco'), vagas: fd.get('vagas') },
+                            })
+                            carregarCfg()
+                          } catch (err) {
+                            setErro(err.message)
+                          }
+                        }}
+                      >
+                        <p className="text-[13px] text-pet-navy">
+                          {a.titulo}
+                          <span className="block text-[11px] uppercase text-pet-navy/45">
+                            {a.tipo} · {a.ocupadas} ocupadas{a.vagas != null ? ` / ${a.vagas}` : ''}
+                          </span>
+                        </p>
+                        <label className="text-[11px] text-pet-navy/50">
+                          Extra
+                          <input name="preco" defaultValue={a.precoExtra} className={classeInput} />
+                        </label>
+                        <label className="text-[11px] text-pet-navy/50">
+                          Vagas
+                          <input name="vagas" defaultValue={a.vagas ?? ''} className={classeInput} />
+                        </label>
+                        <button className="bg-pet-navy py-2 text-[12px] font-semibold text-white">Salvar</button>
+                        <button
+                          type="button"
+                          className="border border-pet-orange py-2 text-[12px] font-semibold text-pet-orange"
+                          onClick={async () => {
+                            if (!confirm(`Apagar "${a.titulo}"?`)) return
+                            setErro('')
+                            try {
+                              await api(`/admin/atividades/${a.id}`, { method: 'DELETE' })
+                              carregarCfg()
+                            } catch (err) {
+                              setErro(err.message)
+                            }
+                          }}
+                        >
+                          Apagar
+                        </button>
+                      </form>
+                    ))}
+                  </div>
+                  <NovaAtividade diaId={dia.id} aoCriar={carregarCfg} />
+                </section>
+              )
+            })}
           </div>
         )}
 
@@ -267,9 +321,13 @@ export default function Admin() {
             className="max-w-md space-y-3"
             onSubmit={async (e) => {
               e.preventDefault()
-              await api('/admin/config', { method: 'PUT', body: cfg })
               setErro('')
-              alert('Configuração salva.')
+              try {
+                await api('/admin/config', { method: 'PUT', body: cfg })
+                alert('Configuração salva.')
+              } catch (err) {
+                setErro(err.message)
+              }
             }}
           >
             <Campo rotulo="Taxa base (R$)">
@@ -323,6 +381,70 @@ export default function Admin() {
         <Link to="/">← Site público</Link>
       </p>
     </div>
+  )
+}
+
+function NovaAtividade({ diaId, aoCriar }) {
+  const [titulo, setTitulo] = useState('')
+  const [tipo, setTipo] = useState('palestra')
+  const [preco, setPreco] = useState('0')
+  const [vagas, setVagas] = useState('')
+  const [erro, setErro] = useState('')
+  const [enviando, setEnviando] = useState(false)
+
+  async function enviar(e) {
+    e.preventDefault()
+    setEnviando(true)
+    setErro('')
+    try {
+      await api('/admin/atividades', {
+        method: 'POST',
+        body: {
+          diaId,
+          titulo,
+          tipo,
+          precoExtra: Number(preco || 0),
+          vagas: vagas === '' ? null : Number(vagas),
+        },
+      })
+      setTitulo('')
+      setPreco('0')
+      setVagas('')
+      await aoCriar()
+    } catch (err) {
+      setErro(err.message)
+    } finally {
+      setEnviando(false)
+    }
+  }
+
+  return (
+    <form onSubmit={enviar} className="mt-2 grid gap-2 border border-dashed border-pet-navy/25 bg-white p-3 sm:grid-cols-[1fr_120px_80px_80px_90px]">
+      <label className="text-[11px] text-pet-navy/50">
+        Nova atividade
+        <input className={classeInput} value={titulo} onChange={(e) => setTitulo(e.target.value)} placeholder="Título" required />
+      </label>
+      <label className="text-[11px] text-pet-navy/50">
+        Tipo
+        <select className={classeInput} value={tipo} onChange={(e) => setTipo(e.target.value)}>
+          {TIPOS.map((t) => (
+            <option key={t.id} value={t.id}>{t.rotulo}</option>
+          ))}
+        </select>
+      </label>
+      <label className="text-[11px] text-pet-navy/50">
+        Extra
+        <input className={classeInput} type="number" min="0" step="0.01" value={preco} onChange={(e) => setPreco(e.target.value)} />
+      </label>
+      <label className="text-[11px] text-pet-navy/50">
+        Vagas
+        <input className={classeInput} type="number" min="0" step="1" value={vagas} onChange={(e) => setVagas(e.target.value)} placeholder="livre" />
+      </label>
+      <button disabled={enviando} className="self-end bg-pet-orange py-2 text-[12px] font-semibold text-white">
+        Cadastrar
+      </button>
+      {erro && <p className="text-[12px] text-pet-orange sm:col-span-5">{erro}</p>}
+    </form>
   )
 }
 

@@ -15,6 +15,7 @@ export const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit: 10,
   namedPlaceholders: true,
+  charset: 'utf8mb4',
 })
 
 export async function q(sql, params) {
@@ -43,20 +44,13 @@ export async function iniciarBanco() {
   }
   await pool.query(
     `INSERT IGNORE INTO config (id, taxa_base, conta_pix, prazo_cancelamento_dias, percentual_reembolso, inscricoes_abertas)
-     VALUES (1, 15.00, 'Asaas sandbox — configurável no /admin', 7, 100.00, 1)`,
+     VALUES (1, 15.00, 'Pix gerado pelo Asaas', 7, 100.00, 1)`,
   )
 
   for (const a of ATIVIDADES) {
     await pool.query(
-      `INSERT INTO atividades (id, dia_id, dia_rotulo, data_curta, tipo, titulo, preco_extra, vagas, ordem)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-       ON DUPLICATE KEY UPDATE
-         dia_id = VALUES(dia_id),
-         dia_rotulo = VALUES(dia_rotulo),
-         data_curta = VALUES(data_curta),
-         tipo = VALUES(tipo),
-         titulo = VALUES(titulo),
-         ordem = VALUES(ordem)`,
+      `INSERT IGNORE INTO atividades (id, dia_id, dia_rotulo, data_curta, tipo, titulo, preco_extra, vagas, ordem)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [a.id, a.diaId, a.diaRotulo, a.dataCurta, a.tipo, a.titulo, a.precoExtra, a.vagas, a.ordem],
     )
   }
@@ -69,6 +63,13 @@ export async function config() {
 
 export function nomeExibicao(p) {
   return p.usa_nome_social && p.nome_social ? p.nome_social : p.nome_completo
+}
+
+export function dentroDoPrazo(inscritoEm, dias) {
+  const limite = new Date(inscritoEm)
+  if (Number.isNaN(limite.getTime())) return true
+  limite.setDate(limite.getDate() + Number(dias || 0))
+  return new Date() <= limite
 }
 
 const STATUS_OCUPA = `('aguardando_pix','aguardando_gratuidade','pago')`
@@ -114,6 +115,7 @@ export async function montarInscricao(participanteId) {
     [participanteId],
   )
   if (!p) return null
+  const cfg = await config()
   const ats = await q(
     `SELECT a.id, a.titulo, a.tipo, a.dia_rotulo, a.data_curta, a.preco_extra
      FROM inscricao_atividades ia
@@ -143,6 +145,7 @@ export async function montarInscricao(participanteId) {
     credenciadoEm: p.credenciado_em,
     canceladaEm: p.cancelada_em,
     inscritoEm: p.inscrito_em,
+    podeCancelar: p.status !== 'cancelada' && dentroDoPrazo(p.inscrito_em, cfg.prazo_cancelamento_dias),
     atividades: ats.map((a) => ({
       id: a.id,
       titulo: a.titulo,

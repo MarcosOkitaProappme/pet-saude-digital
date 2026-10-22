@@ -1,13 +1,5 @@
 import { evento } from '../../data/evento'
-
-const itens = [
-  'Inscrições abertas',
-  `Taxa única de ${evento.taxa}`,
-  '80 vagas presenciais',
-  'Submissão de artigos até 05/10',
-  `${evento.data} · ${evento.cidade}`,
-  `Certificado de ${evento.cargaHoraria}`,
-]
+import { useTaxa } from '../../hooks/useTaxa'
 
 /**
  * Faixa superior em movimento continuo.
@@ -17,6 +9,15 @@ const itens = [
  * urgente (inscricao aberta e paga) fica em movimento no topo da tela.
  */
 export default function Ticker() {
+  const taxa = useTaxa()
+  const itens = [
+    'Inscrições abertas',
+    `Taxa única de ${taxa}`,
+    '80 vagas presenciais',
+    'Submissão de artigos até 05/10',
+    `${evento.data} · ${evento.cidade}`,
+    `Certificado de ${evento.cargaHoraria}`,
+  ]
   // A lista e duplicada porque a animacao translada -50%: quando a primeira
   // metade sai da tela, a segunda ja esta no lugar e o loop fica continuo.
   const sequencia = [...itens, ...itens]
